@@ -1,11 +1,12 @@
-# Desarrollo Móvil: Conceptos Generales
+# Desarrollo Móvil — Biblioteca de Conceptos
 
-> Biblioteca de conceptos — Bootcamp de Desarrollo de Apps Móviles con Flutter (Código Facilito)
-> Módulo 1: Introducción
+Bootcamp de Desarrollo de Apps Móviles con Flutter — Código Facilito — Prof. Marines Méndez
+
+> Este archivo se organiza por concepto, no cronológicamente. Para el orden real en que se dieron las clases, ver `bitacora.md` y el historial de commits.
 
 ## Índice
 
-- [Desarrollo Móvil: Conceptos Generales](#desarrollo-móvil-conceptos-generales)
+- [Desarrollo Móvil — Biblioteca de Conceptos](#desarrollo-móvil--biblioteca-de-conceptos)
   - [Índice](#índice)
   - [1. ¿Qué es un dispositivo móvil?](#1-qué-es-un-dispositivo-móvil)
   - [2. Sistemas operativos](#2-sistemas-operativos)
@@ -20,7 +21,6 @@
   - [8. Almacenamiento en apps](#8-almacenamiento-en-apps)
   - [9. Tipos de desarrollo de apps](#9-tipos-de-desarrollo-de-apps)
   - [10. Ruta de aprendizaje del bootcamp](#10-ruta-de-aprendizaje-del-bootcamp)
-  - [Ejemplos prácticos](#ejemplos-prácticos)
 
 ---
 
@@ -36,15 +36,10 @@ Al programar existen distintas **capas** entre el código que escribimos y el ha
 
 ### 2.1 Arquitectura de Android
 
-```
-┌───────────────────────────────┐
-│  Apps / Permisos               │  ← el usuario autoriza el acceso
-│  (cámara, ubicación, etc.)     │     (capa de restricción)
-├───────────────────────────────┤
-│  Java API Framework            │  ← traduce nuestro código
-├───────────────────────────────┤
-│  Núcleo (basado en Linux)      │  ← traduce todo a lenguaje máquina
-└───────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Apps / Permisos<br/>(cámara, ubicación, etc.)<br/>el usuario autoriza el acceso"] --> B["Java API Framework<br/>traduce nuestro código"]
+    B --> C["Núcleo (basado en Linux)<br/>traduce todo a lenguaje máquina"]
 ```
 
 Google no da acceso libre a todo el dispositivo: ciertas funciones (cámara, ubicación, etc.) requieren que el usuario otorgue permisos explícitos. A diferencia de Apple, Android tiene convenios con múltiples fabricantes (Xiaomi, Samsung, Oppo, etc.), por lo que cada dispositivo puede variar bastante en hardware (número de cámaras, lector de huellas, lápiz óptico, etc.).
@@ -53,16 +48,11 @@ Google no da acceso libre a todo el dispositivo: ciertas funciones (cámara, ubi
 
 Es una arquitectura más simple y más controlada: Apple es más estricta con lo que se puede desarrollar y publicar.
 
-```
-┌───────────────────────────────┐
-│  Cocoa Touch                   │  ← frameworks nativos para desarrolladores
-├───────────────────────────────┤
-│  Capa multimedia               │  ← gráficos, sonido, reproducción de video
-├───────────────────────────────┤
-│  Core Services                 │  ← APIs, descarga de datos
-├───────────────────────────────┤
-│  Core OS (Linux kernel)        │
-└───────────────────────────────┘
+```mermaid
+flowchart TD
+    A["Cocoa Touch<br/>frameworks nativos para desarrolladores"] --> B["Capa multimedia<br/>gráficos, sonido, reproducción de video"]
+    B --> C["Core Services<br/>APIs, descarga de datos"]
+    C --> D["Core OS (Linux kernel)"]
 ```
 
 De ambas arquitecturas, las capas más relevantes para el desarrollo de apps son **Java API Framework** (Android) y **Cocoa Touch** (iOS): son las que exponen a los desarrolladores las herramientas para construir la interfaz y acceder a las funciones del dispositivo.
@@ -213,7 +203,3 @@ Los **widgets** son los encargados de manejar el diseño (equivalente a un canva
 - También se puede probar la app directamente en un celular físico.
 
 ---
-
-## Ejemplos prácticos
-
-*(Sin ejemplos de código en esta clase — fue una clase teórica introductoria.)*
