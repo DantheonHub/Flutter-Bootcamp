@@ -43,8 +43,14 @@ Bootcamp de Desarrollo de Apps Móviles con Flutter — Código Facilito — Pro
   - [29. Listas horizontales y listas dentro de listas](#29-listas-horizontales-y-listas-dentro-de-listas)
   - [30. `GridView`: cuadrículas con scroll](#30-gridview-cuadrículas-con-scroll)
   - [31. Lista de objetos: agregar, editar y eliminar](#31-lista-de-objetos-agregar-editar-y-eliminar)
+  - [32. Colores: `Colors`, hexadecimal y RGB](#32-colores-colors-hexadecimal-y-rgb)
+  - [33. Centralizar los colores: de valores sueltos a roles](#33-centralizar-los-colores-de-valores-sueltos-a-roles)
+  - [34. `ColorScheme`: paleta de roles](#34-colorscheme-paleta-de-roles)
+  - [35. `ThemeData`, tema global y modo claro/oscuro](#35-themedata-tema-global-y-modo-clarooscuro)
+  - [36. Tipografía: escala de Material 3 y `textTheme`](#36-tipografía-escala-de-material-3-y-texttheme)
+  - [37. Temas de componentes: botones, `Card` y `AppBar`](#37-temas-de-componentes-botones-card-y-appbar)
 
-**Repaso rápido para el examen:** [21](#21-texteditingcontroller-y-atributos-de-textformfield) · [22](#22-form-globalkeyformstate-y-validación) · [28](#28-atributos-de-listview)
+**Repaso rápido para el examen:** [21](#21-texteditingcontroller-y-atributos-de-textformfield) · [22](#22-form-globalkeyformstate-y-validación) · [28](#28-atributos-de-listview) · [37](#37-temas-de-componentes-botones-card-y-appbar)
 
 ---
 
@@ -1447,3 +1453,363 @@ void showForm(User? user) {
 ---
 
 *Fuentes puntuales de las secciones 27 a 31: documentación oficial de Flutter — [`ListView`](https://api.flutter.dev/flutter/widgets/ListView/ListView.html), [`ListView.builder`](https://api.flutter.dev/flutter/widgets/ListView/ListView.builder.html), [`physics`](https://api.flutter.dev/flutter/widgets/ScrollView/physics.html) y [`AlwaysScrollableScrollPhysics`](https://api.flutter.dev/flutter/widgets/AlwaysScrollableScrollPhysics-class.html).*
+
+---
+
+## 32. Colores: `Colors`, hexadecimal y RGB
+
+Flutter ofrece tres formas de definir un color, de menor a mayor control:
+
+| Forma | Ejemplo | Cuándo usarla |
+|---|---|---|
+| Clase `Colors` (paleta de Material Design) | `Colors.blue`, `Colors.blue[900]` | Prototipos y casos en que alcanza con un color estándar |
+| Clase `Color` con código hexadecimal | `Color(0xFF42A5F5)` | Colores exactos de una marca |
+| Clase `Color` con valores RGB | `Color.fromARGB(255, 66, 165, 245)` | Cuando el color viene expresado en canales numéricos |
+
+**`Colors`.** Cada color de la paleta admite tonos del 50 al 900: cuanto menor el número, más claro el tono (`Colors.pink[50]` es un rosa casi blanco) y cuanto mayor, más intenso (`Colors.blue[900]` es un azul muy oscuro). El operador `[]` devuelve un `Color?`; `Colors.blue.shade900` devuelve el mismo tono como `Color` no nulo. La lista completa de tonos está en la [documentación de la clase `Colors`](https://api.flutter.dev/flutter/material/Colors-class.html).
+
+**Hexadecimal.** El valor se escribe como literal `0x` seguido de cuatro pares de dígitos: `Color(0xAARRGGBB)`. Los dos primeros (`AA`) son la opacidad (alfa): `FF` es opacidad total (100 %, opaco). Los seis restantes son el código del color **sin el `#`** que se ve en las herramientas de diseño: el color `#42A5F5` se escribe `Color(0xFF42A5F5)`. Olvidar el prefijo `FF` produce un color transparente o incorrecto.
+
+**RGB.** `Color.fromARGB(alfa, rojo, verde, azul)`, con cada valor entre 0 y 255; el primero es la opacidad (255 = opaco). Existe también `Color.fromRGBO(rojo, verde, azul, opacidad)`, que recibe la opacidad como número entre 0.0 y 1.0.
+
+## 33. Centralizar los colores: de valores sueltos a roles
+
+Escribir el color directamente en cada widget (`Card(color: Color(0xFF7F6484))`, `backgroundColor: Color(0xFF7F6484)` en un botón) funciona en una pantalla pequeña, pero no escala: si el cliente cambia la paleta, hay que recorrer todos los widgets uno por uno, con el riesgo de olvidar alguno y entregar una app con colores desparejos.
+
+El primer paso es **centralizar** los colores en un único archivo y referenciarlos por nombre:
+
+```dart
+// app_colors.dart
+class AppColors {
+  static const Color purple = Color(0xFF7F6484);
+}
+
+Card(color: AppColors.purple, child: const Text('Hola mundo'))
+```
+
+Cambiar `Color(0xFF7F6484)` en ese archivo actualiza toda la app. El segundo problema es el **nombre**: si la marca pasa del morado al verde, `AppColors.purple` seguiría apuntando a un verde, y corregir el nombre obliga a tocar todos los archivos que lo usan.
+
+La solución de Material Design 3 son los **roles de color**: nombres semánticos que describen la *función* del color en la interfaz (`primary`, `surface`, `error`) y no su aspecto (`purple`, `red`). Cambiar la marca del morado al verde solo modifica el valor de `primary`; ningún nombre queda desactualizado.
+
+## 34. `ColorScheme`: paleta de roles
+
+`ColorScheme` es la clase que agrupa la paleta de una app por roles. En lugar de aplicar un color a cada widget, se define el esquema y Material Design decide en qué elemento va cada rol.
+
+| Rol | Función |
+|---|---|
+| `primary` | Color de acento principal, para lo más importante de la interfaz: `AppBar`, botones, botón flotante |
+| `secondary` | Acento para elementos menos urgentes (el fondo de un ícono de estrella inactivo, el estado de selección de un ícono) |
+| `tertiary` | Acento para elementos pequeños que se quieren enfatizar (una insignia que sugiere un seguimiento) |
+| `surface` | Color por defecto de los fondos |
+| `error` | Color llamativo sobre la superficie que indica urgencia (rellenos, íconos, texto) |
+| `primaryContainer`, `secondaryContainer`, `tertiaryContainer`, `errorContainer` | Variantes de relleno de cada acento, para contenedores de menor énfasis |
+| `onPrimary`, `onSecondary`, `onTertiary`, `onSurface`, `onError`, `onSurfaceVariant`, … | Color de texto e íconos **sobre** el color correspondiente |
+
+**Los roles `on…`.** Todo rol tiene su par `on…`, que indica el color de lo que se coloca encima. Si el botón flotante es de color `primary`, el ícono que lleva adentro toma `onPrimary`; si el fondo es `surface`, el texto es `onSurface`; un `error` rojo lleva texto `onError` (típicamente blanco). Definir siempre ambos evita combinaciones ilegibles, como texto rojo sobre fondo rojo o blanco sobre blanco. `onSurfaceVariant` es una variante de menor énfasis para texto e íconos sobre superficies.
+
+> ⚠️ El rol `background`, que en versiones anteriores de Material definía el fondo, está deprecado desde Flutter 3.18: el fondo se define con `surface`.
+
+Los errores (por ejemplo, el borde y el mensaje de un `TextFormField` que falla su `validator`, sección 22) toman automáticamente el color `error`. Conviene mantener ese rol dentro de los rojos, variando a lo sumo la intensidad: si se define en verde, los errores se muestran en verde y el usuario no los reconoce como tales.
+
+**Esquema para modo claro y modo oscuro.** Los nombres de rol son los mismos en ambos modos; cambian los valores. En el modo oscuro el `primary` suele ser más claro que en el claro, para destacar contra un fondo oscuro:
+
+```dart
+final ColorScheme lightScheme = ColorScheme.light(
+  primary: const Color(0xFF1E6FD9),
+  onPrimary: const Color(0xFFFFFFFF),
+  secondary: const Color(0xFF5A5D72),
+  onSecondary: const Color(0xFFFFFFFF),
+  error: const Color(0xFFBA1A1A),
+  onError: const Color(0xFFFFFFFF),
+  surface: const Color(0xFFFFFFFF),
+  onSurface: const Color(0xFF1B1B1F),
+);
+
+final ColorScheme darkScheme = ColorScheme.dark(
+  primary: const Color(0xFFAAC7FF),
+  onPrimary: const Color(0xFF002F65),
+  secondary: const Color(0xFFC2C5DD),
+  onSecondary: const Color(0xFF2B3042),
+  error: const Color(0xFFFFB4AB),
+  onError: const Color(0xFF690005),
+  surface: const Color(0xFF121316),
+  onSurface: const Color(0xFFE3E2E6),
+);
+```
+
+**Esquema a partir de una semilla.** Cuando la marca todavía no tiene una paleta definida, `ColorScheme.fromSeed` genera un esquema completo y armónico a partir de un único color base (la *semilla*):
+
+```dart
+ColorScheme.fromSeed(seedColor: Colors.orange)
+ColorScheme.fromSeed(seedColor: Colors.orange, brightness: Brightness.dark)
+```
+
+Con `seedColor: Colors.orange`, toda la app toma tonos de naranja, con los roles (`primary`, `surface`, `on…`) calculados por Flutter. Es también la razón por la que un proyecto nuevo de Flutter se ve morado: la plantilla usa una semilla morada. Es la vía más rápida cuando no hay paleta; cuando sí la hay, se define el esquema a mano como en el ejemplo anterior.
+
+**Generadores de paleta.** Dos herramientas web generan los colores y exportan el código para Flutter:
+
+- [Material Theme Builder](https://material-foundation.github.io/material-theme-builder/): genera el tema completo (modo claro y oscuro, niveles de contraste, tipografías) y lo exporta para Android (XML), Jetpack Compose o Flutter, este último en un `.zip` con el archivo del tema.
+- [Material 3 Color Generator](https://www.logicui.com/colorgenerator): más simple; se eligen solo `primary`, `secondary`, `tertiary` y `error`, y el resto de los roles (fondos, superficies) se calculan solos.
+
+El código exportado queda dentro del proyecto, así que cualquier color que no convenza puede editarse después.
+
+## 35. `ThemeData`, tema global y modo claro/oscuro
+
+`ThemeData` es la clase que reúne la configuración visual de toda la app: el esquema de colores, la tipografía (sección 36) y el estilo por defecto de widgets como botones, `Card` o `AppBar` (sección 37). Se le pasa a `MaterialApp`, y cada widget consulta el tema en lugar de recibir colores propios.
+
+**Organización en archivos.** Una estructura habitual separa la paleta, el tema y la tipografía dentro de una carpeta `tema/` (los nombres de archivo van en minúscula y con `_`, ver sección 31):
+
+```
+lib/
+  tema/
+    app_colors.dart      // colores en bruto (hexadecimales)
+    app_tema.dart        // ColorScheme + ThemeData claro y oscuro
+    app_text_tema.dart   // tipografía
+```
+
+```dart
+// tema/app_colors.dart
+part of 'app_tema.dart';
+
+class _AppColors {
+  // Modo claro
+  static const Color primaryLight = Color(0xFF1E6FD9);
+  static const Color onPrimaryLight = Color(0xFFFFFFFF);
+  // ... resto de los roles
+
+  // Modo oscuro
+  static const Color primaryDark = Color(0xFFAAC7FF);
+  static const Color onPrimaryDark = Color(0xFF002F65);
+  // ... resto de los roles
+}
+```
+
+```dart
+// tema/app_tema.dart
+import 'package:flutter/material.dart';
+
+part 'app_colors.dart';
+
+class AppTema {
+  final TextTheme textTheme;
+  const AppTema(this.textTheme);
+
+  static final ColorScheme _lightScheme = ColorScheme.light(
+    primary: _AppColors.primaryLight,
+    onPrimary: _AppColors.onPrimaryLight,
+    // ... resto de los roles
+  );
+
+  static final ColorScheme _darkScheme = ColorScheme.dark(
+    primary: _AppColors.primaryDark,
+    onPrimary: _AppColors.onPrimaryDark,
+    // ... resto de los roles
+  );
+
+  ThemeData light() => _build(_lightScheme);
+  ThemeData dark() => _build(_darkScheme);
+
+  ThemeData _build(ColorScheme scheme) {
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: scheme,
+      textTheme: textTheme,
+    );
+  }
+}
+```
+
+`light()` y `dark()` son métodos y no variables porque necesitan el `textTheme` que recibe cada instancia: el inicializador de un campo no tiene acceso a `this`.
+
+**Acceso restringido a los colores en bruto.** Para que nadie del equipo escriba `AppColors.primaryLight` directamente dentro de un widget (y reintroduzca el problema de la sección 33), se restringe el acceso con dos mecanismos de Dart:
+
+- Un nombre que empieza con `_` es **privado a su biblioteca** (por defecto, el archivo donde está declarado): `_AppColors` no puede usarse desde otro archivo.
+- `part` y `part of` hacen que dos archivos formen **una sola biblioteca**. `app_tema.dart` declara `part 'app_colors.dart';` y `app_colors.dart` empieza con `part of 'app_tema.dart';` (sin `import` propio: usa los del archivo principal). Así `_AppColors` es visible para `app_tema.dart` y para ningún otro archivo.
+
+Con esto, el único camino para obtener un color desde un widget es el tema:
+
+```dart
+final scheme = Theme.of(context).colorScheme;
+
+Container(color: scheme.primary, child: Text("Hola", style: TextStyle(color: scheme.onPrimary)))
+```
+
+`Theme.of(context)` devuelve el tema que está activo en ese momento, así que `scheme.primary` cambia solo al pasar de modo claro a oscuro. Un color en bruto, en cambio, queda fijo en ambos modos; solo tiene sentido saltearse el tema en el caso puntual en que un color no deba cambiar nunca.
+
+**Aplicar el tema en la app.** `MaterialApp` recibe tres atributos: `theme` (tema claro), `darkTheme` (tema oscuro) y `themeMode` (cuál usar: `ThemeMode.light`, `ThemeMode.dark` o `ThemeMode.system`, que sigue la configuración del dispositivo y es el valor por defecto).
+
+**Botón para alternar de modo.** Como cambiar el modo redibuja toda la app, el estado (`themeMode`) vive en un `StatefulWidget` y la pantalla recibe una función para modificarlo:
+
+```dart
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void _toggleTema() {
+    setState(() {
+      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = AppTextTema.createTextTheme(context, "Arimo", "Abril Fatface");
+    final appTema = AppTema(textTheme);
+
+    return MaterialApp(
+      theme: appTema.light(),
+      darkTheme: appTema.dark(),
+      themeMode: _themeMode,
+      home: UserListScreen(onToggleTema: _toggleTema),
+    );
+  }
+}
+```
+
+```dart
+class UserListScreen extends StatefulWidget {
+  final VoidCallback onToggleTema;
+  const UserListScreen({super.key, required this.onToggleTema});
+  // ...
+}
+
+// En el State, dentro del build:
+AppBar(
+  actions: [
+    IconButton(
+      icon: Icon(
+        Theme.of(context).brightness == Brightness.dark
+            ? Icons.light_mode
+            : Icons.dark_mode,
+      ),
+      onPressed: widget.onToggleTema,
+    ),
+  ],
+)
+```
+
+- Un `State` accede a los atributos de su `StatefulWidget` a través de `widget.` (`widget.onToggleTema`): son dos clases distintas, y ese es el puente entre ellas.
+- `Theme.of(context).brightness` indica si el tema activo es claro u oscuro; se usa acá para mostrar el ícono contrario al modo actual (el sol para volver al claro, la luna para pasar al oscuro).
+- Flutter anima la transición entre ambos temas sin código adicional.
+
+> ⚠️ Un widget que recibe una función como parámetro no puede instanciarse con `const`, porque la función no es una constante. Si aparece un error al construirlo, hay que quitar el `const` de esa instancia.
+
+## 36. Tipografía: escala de Material 3 y `textTheme`
+
+Material 3 define una escala tipográfica de 15 estilos: cinco categorías con tres tamaños cada una (`large`, `medium`, `small`). El tamaño, el peso y el interlineado de cada estilo ya vienen definidos para el uso que se le da en la interfaz.
+
+| Categoría | Estilos | Uso |
+|---|---|---|
+| `display` | `displayLarge`, `displayMedium`, `displaySmall` | Textos muy grandes y llamativos: un porcentaje, un marcador, un «404» |
+| `headline` | `headlineLarge`, … | Títulos de pantalla o de sección (por ejemplo, «Editar perfil») |
+| `title` | `titleLarge`, … | Títulos menores, como el del `AppBar` |
+| `body` | `bodyLarge`, `bodyMedium`, `bodySmall` | Texto corrido. `bodyLarge` para descripciones (la de un producto); `bodyMedium` es el estilo de cualquier `Text` sin estilo propio |
+| `label` | `labelLarge`, … | Botones, chips y etiquetas |
+
+La práctica habitual es **conservar la escala tal como viene y cambiar únicamente la familia tipográfica**, con dos fuentes: una para los títulos (`display`, `headline`, `title`) y otra, más neutra, para los textos (`body`, `label`). Modificar los tamaños uno por uno rara vez hace falta, y la fuente predeterminada del dispositivo suele ser la mejor opción salvo que la identidad de la marca exija otra.
+
+**Fuentes con `google_fonts`.** El paquete `google_fonts` (`flutter pub add google_fonts`) permite usar cualquier familia de [fonts.google.com](https://fonts.google.com) por nombre. Por defecto descarga la fuente por HTTP al ejecutarse y la guarda en caché; para apps que deban funcionar sin conexión, los archivos de la fuente pueden incluirse en los `assets` del proyecto y el paquete los usa en lugar de descargarlos. El nombre debe ser el de una familia que exista en Google Fonts (por ejemplo, `Arimo`, alternativa libre equivalente a Arial).
+
+```dart
+// tema/app_text_tema.dart
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+class AppTextTema {
+  static TextTheme createTextTheme(
+    BuildContext context,
+    String bodyFont,
+    String displayFont,
+  ) {
+    final base = Theme.of(context).textTheme;
+    final bodyTextTheme = GoogleFonts.getTextTheme(bodyFont, base);
+    final displayTextTheme = GoogleFonts.getTextTheme(displayFont, base);
+
+    return displayTextTheme.copyWith(
+      bodyLarge: bodyTextTheme.bodyLarge,
+      bodyMedium: bodyTextTheme.bodyMedium,
+      bodySmall: bodyTextTheme.bodySmall,
+      labelLarge: bodyTextTheme.labelLarge,
+      labelMedium: bodyTextTheme.labelMedium,
+      labelSmall: bodyTextTheme.labelSmall,
+    );
+  }
+}
+```
+
+Esta es la misma función que exporta Material Theme Builder (sección 34):
+
+- `base` es el `TextTheme` vigente: conserva tamaños y pesos de la escala.
+- `GoogleFonts.getTextTheme` devuelve una copia de `base` con la fuente indicada aplicada a los quince estilos.
+- Se obtienen dos copias (una por fuente) y `copyWith` parte de la de títulos, reemplazando los estilos `body` y `label` por los de la fuente de textos. El resultado combina ambas familias.
+- El `BuildContext` se necesita para leer el tema actual con `Theme.of(context)`.
+
+El `TextTheme` resultante se entrega a `AppTema` (sección 35), que lo aplica en `ThemeData` para modo claro y oscuro. Desde ahí, cada estilo se consulta desde el tema en lugar de definir la fuente en cada `Text`:
+
+```dart
+Text("Descripción del producto", style: Theme.of(context).textTheme.bodyLarge)
+Text("Abrir diálogo", style: Theme.of(context).textTheme.displayLarge)
+```
+
+Fijar la fuente directamente en cada `Text` (`style: TextStyle(fontFamily: ...)`) obliga a repetirlo en cada widget y a revisarlos uno por uno si la fuente cambia, el mismo problema de los colores sueltos.
+
+**Ajustes puntuales.** Si un estilo concreto necesita modificarse (color, separación entre letras), se hace sobre el `TextTheme` con `copyWith`, o con `apply` para cambiar el color de todos los estilos a la vez:
+
+```dart
+textTheme.copyWith(
+  bodyMedium: textTheme.bodyMedium?.copyWith(letterSpacing: 1.5),
+)
+
+textTheme.apply(bodyColor: Colors.blue, displayColor: Colors.blue)
+```
+
+Como `bodyMedium` es el estilo por defecto, un cambio ahí afecta a todo texto sin estilo propio.
+
+## 37. Temas de componentes: botones, `Card` y `AppBar`
+
+`ThemeData` también permite definir el estilo por defecto de cada tipo de widget. Con eso, todos los botones, `Card` o `AppBar` de la app comparten el mismo diseño sin repetir atributos en cada uno. Se agregan dentro de `_build` (sección 35), tomando los colores del esquema:
+
+```dart
+ThemeData _build(ColorScheme scheme) {
+  return ThemeData(
+    useMaterial3: true,
+    colorScheme: scheme,
+    textTheme: textTheme,
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+      ),
+    ),
+    cardTheme: CardThemeData(
+      color: scheme.surface,
+      elevation: 5,
+      margin: const EdgeInsets.all(20),
+    ),
+    appBarTheme: AppBarTheme(
+      backgroundColor: scheme.primary,
+      foregroundColor: scheme.onPrimary,
+    ),
+  );
+}
+```
+
+| Atributo de `ThemeData` | Aplica a | Qué define en el ejemplo |
+|---|---|---|
+| `elevatedButtonTheme` | Todos los `ElevatedButton` | Fondo `primary` y texto `onPrimary` (el rol `on…` de lo que va encima) |
+| `cardTheme` | Todos los `Card` | Color de fondo `surface`, elevación de 5 y margen de 20 en cada lado |
+| `appBarTheme` | Todos los `AppBar` | Fondo `primary` y texto e íconos `onPrimary` |
+
+Cada widget creado a partir de ahí toma ese estilo, y cambiarlo se resuelve en un solo lugar. Un widget individual puede seguir sobrescribiéndolo con su propio `style` o `color` cuando un caso lo requiera. Como `_build` recibe el esquema, los mismos estilos se aplican al modo claro y al oscuro con los colores de cada uno.
+
+> 📌 **Para el examen:** los atributos que cubre el quiz de la clase: `ColorScheme` para armar paletas por rol, modo claro y oscuro (`theme`, `darkTheme`, `themeMode`), `textTheme` para la tipografía y el tema de la app (`ThemeData`, incluidos los temas de componentes).
+
+---
+
+*Fuentes puntuales de las secciones 32 a 37: documentación oficial de Flutter — [`Colors`](https://api.flutter.dev/flutter/material/Colors-class.html), [`ColorScheme.background` (deprecado a favor de `surface`)](https://api.flutter.dev/flutter/material/ColorScheme/background.html), [`ThemeData`](https://api.flutter.dev/flutter/material/ThemeData/ThemeData.html) y [«Use themes to share colors and font styles»](https://docs.flutter.dev/cookbook/design/themes.html); y la documentación del paquete [`google_fonts`](https://pub.dev/documentation/google_fonts/latest/index.html).*

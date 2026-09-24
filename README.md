@@ -9,7 +9,7 @@ El contenido está organizado como una **biblioteca de conceptos**: un archivo `
 - **Fundamentos de desarrollo móvil** *(contenido teórico, sin código aún)*: arquitectura de Android e iOS, niveles de API y fragmentación, privacidad, tamaño/resolución/densidad de pantalla, unidades `dp`/`sp`/`pt`, evolución del diseño de interfaces (skeuomorfismo, flat design, glassmorfismo), SDKs y frameworks nativos, tipos de almacenamiento, tipos de desarrollo de apps (nativo, híbrido, multiplataforma).
 - **Módulo 2 — Dart**: cubierto a través del [**Curso profesional de Dart**](https://github.com/DantheonHub/Curso-de-Dart), tomado como material complementario del bootcamp. Ese repositorio funciona como la biblioteca de conceptos de Dart para todo el bootcamp — acá solo se registra en la bitácora qué se vio en cada clase en vivo relacionada.
 - **Módulo 3 — Flutter**: widgets fundamentales (`Card`, `Container`, `ListTile`, menús, ventanas flotantes), árbol de widgets, `StatelessWidget`/`StatefulWidget` y manejo básico de estado.
-- **Módulo 4 — Listas y formularios** *(en curso)*: `TextFormField` y validaciones, `Form`, selección (`Radio`/`Checkbox`/`Switch`, `Dropdown`), `ListView`, `GridView`, listas anidadas y CRUD en memoria con `setState`.
+- **Módulo 4 — Listas y formularios** *(en curso)*: `TextFormField` y validaciones, `Form`, selección (`Radio`/`Checkbox`/`Switch`, `Dropdown`), `ListView`, `GridView`, listas anidadas, CRUD en memoria con `setState`, y temas globales (colores por rol con `ColorScheme`, modo claro/oscuro, tipografía y temas de componentes).
 
 *(Esta sección se irá ampliando a medida que avancen los módulos de Flutter, arquitectura y manejo de estado, persistencia con SQLite y consumo de APIs.)*
 

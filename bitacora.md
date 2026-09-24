@@ -67,3 +67,12 @@ Una línea por clase real, en el orden en que se dictaron. El detalle técnico d
   > El quiz se puede repetir las veces que se quiera. Diapositivas, quiz y código de la clase en el repo de la profesora ([`Marines0210/bootcamp_flutter`](https://github.com/Marines0210/bootcamp_flutter)).
   >
   > Mencionado en clase, para más adelante: CRUD genérico con abstracción y polimorfismo (al ver patrones arquitectónicos) y cantidad de columnas del `GridView` según dispositivo (al ver app responsiva).
+
+* **Clase 9 — Manejo de temas, colores y estilos**
+  - **Contenido:** colores con `Colors` (tonos 50 a 900), hexadecimal (prefijo `0xFF`) y RGB (`Color.fromARGB`); centralización de colores y por qué usar roles semánticos en vez de nombres de color; `ColorScheme` (`primary`, `secondary`, `tertiary`, `surface`, `error` y sus pares `on…`; `background` reemplazado por `surface`), `ColorScheme.light`/`dark` y `ColorScheme.fromSeed`; generadores de paleta (Material Theme Builder y Material 3 Color Generator); `ThemeData` en una clase `AppTema` (carpeta `tema/`), con `theme`/`darkTheme`/`themeMode` en `MaterialApp` y botón en el `AppBar` para alternar claro/oscuro con `setState`; restricción de acceso a la paleta con `_`, `part` y `part of`; consulta de colores con `Theme.of(context)`; tipografía de Material 3 (`display`, `headline`, `title`, `body`, `label`), `textTheme` con `google_fonts`, `copyWith` y `apply`; temas de componentes (`elevatedButtonTheme`, `cardTheme`, `appBarTheme`). Quiz en vivo de 10 preguntas sobre los atributos vistos (quedaron marcados como tema de examen en `conceptos.md`).
+
+  → Detalle completo en [`flutter/conceptos.md`](./flutter/conceptos.md)
+
+  - **Actividades asignadas:** hacer el quiz de la clase (se puede repetir las veces que se quiera) y practicar generando una paleta propia con alguno de los dos generadores, o usando la paleta de ejemplo de la clase, para aplicarla en el proyecto.
+
+  > Diapositivas, PDF con los colores de ejemplo y código de la clase en el repo de la profesora ([`Marines0210/bootcamp_flutter`](https://github.com/Marines0210/bootcamp_flutter)). Dudas y resultados del quiz, por el canal de Telegram del bootcamp.
