@@ -10,26 +10,34 @@ Bootcamp de Desarrollo de Apps Móviles con Flutter — Código Facilito — Pro
 
 ## Índice
 
-- [1. ¿Qué es un widget, en serio?](#1-qué-es-un-widget-en-serio)
-- [2. El árbol de widgets: `child` y `children`](#2-el-árbol-de-widgets-child-y-children)
-- [3. `BuildContext`: el "dónde estoy parado" de un widget](#3-buildcontext-el-dónde-estoy-parado-de-un-widget)
-- [4. `Key`: identificar widgets entre sí](#4-key-identificar-widgets-entre-sí)
-- [5. `StatelessWidget` vs. `StatefulWidget`](#5-statelesswidget-vs-statefulwidget)
-- [6. `Scaffold` y `AppBar`: la anatomía de una pantalla](#6-scaffold-y-appbar-la-anatomía-de-una-pantalla)
-- [7. Material vs. Cupertino](#7-material-vs-cupertino)
-- [8. Layout: `Column`, `Row`, `Stack` y alineación](#8-layout-column-row-stack-y-alineación)
-- [9. Espaciado: `Padding` vs. `margin`](#9-espaciado-padding-vs-margin)
-- [10. Texto e íconos: `Text`, `RichText`, `Icon`](#10-texto-e-íconos-text-richtext-icon)
-- [11. `Image` y `BoxFit`](#11-image-y-boxfit)
-- [12. Botones](#12-botones)
-- [13. `CircleAvatar`](#13-circleavatar)
-- [14. `Card`](#14-card)
-- [15. `Container`](#15-container)
-- [16. Interactividad: `InkWell` vs. `GestureDetector`](#16-interactividad-inkwell-vs-gesturedetector)
-- [17. `ListTile`](#17-listtile)
-- [18. `SizedBox` y `Divider`](#18-sizedbox-y-divider)
-- [19. Menús: `Drawer` y `BottomNavigationBar`](#19-menús-drawer-y-bottomnavigationbar)
-- [20. Ventanas flotantes: `AlertDialog` y `showModalBottomSheet`](#20-ventanas-flotantes-alertdialog-y-showmodalbottomsheet)
+- [Flutter — Biblioteca de Conceptos](#flutter--biblioteca-de-conceptos)
+  - [Índice](#índice)
+  - [1. ¿Qué es un widget, en serio?](#1-qué-es-un-widget-en-serio)
+  - [2. El árbol de widgets: `child` y `children`](#2-el-árbol-de-widgets-child-y-children)
+  - [3. `BuildContext`: el "dónde estoy parado" de un widget](#3-buildcontext-el-dónde-estoy-parado-de-un-widget)
+  - [4. `Key`: identificar widgets entre sí](#4-key-identificar-widgets-entre-sí)
+  - [5. `StatelessWidget` vs. `StatefulWidget`](#5-statelesswidget-vs-statefulwidget)
+  - [6. `Scaffold` y `AppBar`: la anatomía de una pantalla](#6-scaffold-y-appbar-la-anatomía-de-una-pantalla)
+  - [7. Material vs. Cupertino](#7-material-vs-cupertino)
+  - [8. Layout: `Column`, `Row`, `Stack` y alineación](#8-layout-column-row-stack-y-alineación)
+  - [9. Espaciado: `Padding` vs. `margin`](#9-espaciado-padding-vs-margin)
+  - [10. Texto e íconos: `Text`, `RichText`, `Icon`](#10-texto-e-íconos-text-richtext-icon)
+  - [11. `Image` y `BoxFit`](#11-image-y-boxfit)
+  - [12. Botones](#12-botones)
+  - [13. `CircleAvatar`](#13-circleavatar)
+  - [14. `Card`](#14-card)
+  - [15. `Container`](#15-container)
+  - [16. Interactividad: `InkWell` vs. `GestureDetector`](#16-interactividad-inkwell-vs-gesturedetector)
+  - [17. `ListTile`](#17-listtile)
+  - [18. `SizedBox` y `Divider`](#18-sizedbox-y-divider)
+  - [19. Menús: `Drawer` y `BottomNavigationBar`](#19-menús-drawer-y-bottomnavigationbar)
+  - [20. Ventanas flotantes: `AlertDialog` y `showModalBottomSheet`](#20-ventanas-flotantes-alertdialog-y-showmodalbottomsheet)
+  - [21. `TextEditingController` y atributos de `TextFormField`](#21-texteditingcontroller-y-atributos-de-textformfield)
+  - [22. `Form`, `GlobalKey<FormState>` y validación](#22-form-globalkeyformstate-y-validación)
+  - [23. `inputFormatters`: transformar y restringir lo que se escribe](#23-inputformatters-transformar-y-restringir-lo-que-se-escribe)
+  - [24. Selección: `RadioListTile`, `CheckboxListTile`, `SwitchListTile`](#24-selección-radiolisttile-checkboxlisttile-switchlisttile)
+  - [25. `DropdownButtonFormField`](#25-dropdownbuttonformfield)
+  - [26. Formularios largos: `Stepper` y `AutofillGroup`](#26-formularios-largos-stepper-y-autofillgroup)
 
 ---
 
@@ -575,6 +583,8 @@ Es el patrón habitual en menús y listas de navegación: un ícono identificand
 
 > 📌 El mismo resultado visual de un `ListTile` simple se podría armar a mano combinando un `Row` con un `Icon`, una `Column` de dos `Text` (título y subtítulo), y otro `Icon` al final — pero `ListTile` ya resuelve el espaciado y la alineación correctos por defecto, evitando repetir ese layout manualmente cada vez.
 
+> ⚠️ `title` y `subtitle` de un `ListTile` quedan siempre alineados a la izquierda — no admiten `Alignment.center` ni un `mainAxisAlignment` propio, porque el widget no expone esos parámetros. Para centrar (o alinear de otra forma) el contenido de una fila estilo `ListTile`, hay que reconstruirla a mano con `Row` + `Column`, usando `crossAxisAlignment`/`mainAxisAlignment` como en cualquier layout propio.
+
 ## 18. `SizedBox` y `Divider`
 
 - **`SizedBox`**: widget "vacío" cuyo único propósito es imponerle un ancho y/o alto explícitos a su `child` — o, sin `child`, actuar como un espacio en blanco de tamaño fijo entre dos widgets (por ejemplo, `SizedBox(height: 16)` entre dos elementos de una `Column`, a modo de separador sin necesidad de márgenes).
@@ -698,3 +708,275 @@ showModalBottomSheet(
 ```
 
 Se puede cerrar tocando fuera de él o con el gesto de retroceso, pero conviene siempre agregar un botón explícito de cerrar — muchos usuarios no dan por sentado que se puede descartar tocando afuera, y un botón visible deja claro que la ventana se puede cerrar.
+
+## 21. `TextEditingController` y atributos de `TextFormField`
+
+Para leer o fijar el texto de una caja desde código (no solo mostrarlo) se usa un **`TextEditingController`**: se declara, se inicializa, y se lo asigna al atributo `controller` del `TextFormField`. A partir de ahí, `controller.text` da acceso en cualquier momento al valor actual escrito por el usuario.
+
+```dart
+final _nombreController = TextEditingController();
+
+TextFormField(
+  controller: _nombreController,
+)
+
+// en cualquier otro punto del código, por ejemplo al presionar un botón:
+print(_nombreController.text);
+```
+
+> ⚠️ `controller` e `initialValue` no se pueden usar juntos en el mismo `TextFormField` — Flutter tira error. Si se necesita un texto inicial **y** poder leerlo/modificarlo después desde código, la única vía es el `controller`, inicializándolo con ese valor: `TextEditingController(text: "valor inicial")`. `initialValue` solo sirve para el caso más simple, donde alcanza con fijar un texto de partida sin necesidad de acceder a él por código.
+
+`TextFormField` tiene, además de `controller`, un conjunto amplio de atributos para controlar tanto su apariencia como el comportamiento del teclado:
+
+| Atributo | Qué hace |
+|---|---|
+| `decoration` | Recibe un `InputDecoration` — controla toda la apariencia del campo (detalle abajo) |
+| `style` | `TextStyle` aplicado al texto que el usuario escribe (color, tamaño, negrita) — distinto de la `decoration`, que estiliza el campo alrededor del texto (etiqueta, bordes, fondo), no el texto en sí |
+| `keyboardType` | Qué teclado se muestra: `TextInputType.text` (normal), `.number`, `.emailAddress`, `.phone`, entre otros |
+| `textInputAction` | Qué acción ofrece el botón de "enter"/acción del teclado: `.done`, `.next`, `.search`, etc. |
+| `autofocus` | Si `true`, el campo recibe el foco (y el teclado se abre) automáticamente al construirse la pantalla, sin que el usuario tenga que tocarlo primero |
+| `onFieldSubmitted` | Se ejecuta cuando el usuario presiona ese botón de acción del teclado — permite reaccionar al "enviar" sin necesidad de un botón aparte en pantalla (el mismo patrón que usa WhatsApp: escribir el mensaje y mandarlo con el botón de "enter" del teclado, en vez de tocar un ícono en la interfaz) |
+| `obscureText` | Oculta visualmente el texto ingresado (campos de contraseña) |
+| `enabled` | Habilita o deshabilita la edición del campo — con `false`, el campo se puede seguir mostrando (útil para pantallas de "solo ver mis datos") pero no se puede tocar, escribir ni aparece el teclado |
+| `maxLength` | Límite de caracteres permitidos |
+| `maxLines` | Cantidad de líneas visibles del campo |
+| `onChanged` | Se ejecuta en cada tecleo, devolviendo el texto tal como está en ese instante — útil para reflejar en pantalla, en tiempo real, lo que el usuario va escribiendo (requiere `setState()` para que ese reflejo se vea, como cualquier otra actualización de estado) |
+| `validator` | Función de validación (sección 22) |
+| `inputFormatters` | Lista de transformaciones/restricciones sobre lo que se ingresa (sección 23) |
+
+`decoration` es, en la práctica, el atributo con más superficie: recibe un `InputDecoration` con sus propios sub-atributos.
+
+| Sub-atributo de `InputDecoration` | Qué hace |
+|---|---|
+| `labelText` | Etiqueta del campo — típicamente se ve dentro de la caja y se achica arriba del borde al enfocar o al escribir |
+| `hintText` | Texto de ayuda/pista, visible solo mientras el campo está vacío (desaparece al escribir, a diferencia del `labelText`) |
+| `icon` | Ícono mostrado afuera del campo, antes del borde |
+| `prefixIcon` | Ícono mostrado adentro del campo, al principio (ej. un ícono de sobre en un campo de email) |
+| `suffixIcon` | Ícono mostrado adentro del campo, al final (ej. un ícono de ojo para mostrar/ocultar una contraseña) |
+| `filled` / `fillColor` | `filled: true` habilita un color de fondo sólido para el campo; `fillColor` define cuál |
+| `border` | Borde por defecto del campo, en cualquier estado |
+| `enabledBorder` | Borde cuando el campo está habilitado pero no tiene el foco |
+| `focusedBorder` | Borde cuando el campo tiene el foco (el usuario está escribiendo ahí) |
+
+```dart
+TextFormField(
+  decoration: InputDecoration(
+    labelText: "Correo electrónico",
+    hintText: "nombre@ejemplo.com",
+    prefixIcon: Icon(Icons.email),
+    filled: true,
+    fillColor: Colors.grey[200],
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide(color: Colors.blue, width: 2),
+    ),
+  ),
+)
+```
+
+Definir `enabledBorder` y `focusedBorder` con el mismo `borderRadius` (como en el ejemplo) mantiene el campo con las esquinas redondeadas de forma consistente tanto en reposo como al enfocarlo — si solo se define uno de los dos, el campo puede "cambiar de forma" visualmente al tocarlo, lo que suele leerse como un error de diseño más que como una animación intencional.
+
+> 📌 **Para el examen:** los atributos de `TextFormField` de esta tabla y los sub-atributos de `decoration` (`labelText`, `hintText`, `icon`/`prefixIcon`/`suffixIcon`, `filled`/`fillColor`, `border`/`enabledBorder`/`focusedBorder`).
+
+## 22. `Form`, `GlobalKey<FormState>` y validación
+
+Cuando una pantalla tiene varias cajas de texto que se completan y validan juntas (un formulario de registro, por ejemplo), conviene envolverlas en un widget **`Form`**: su trabajo es agrupar todos los `TextFormField` que tenga adentro y permitir validarlos en conjunto, con una sola instrucción, en vez de revisar campo por campo a mano.
+
+> ⚠️ Un formulario con varios campos suele superar el alto de la pantalla. Cuando el contenido de un `Column` (u otro widget de layout) excede el espacio disponible y no hay forma de desplazarse, Flutter lo señala con un patrón de rayas amarillas y negras en el borde inferior — es un error de *overflow*, no un widget roto. La solución habitual es envolver el `Form` (o la `Column` que lo contiene) en un `SingleChildScrollView`, que agrega scroll vertical y deja ver el resto del contenido más allá de lo que entra en la pantalla de una vez.
+
+Para poder controlar ese `Form` desde código (disparar la validación, guardar los datos) hace falta identificarlo con una **`GlobalKey<FormState>`** — el mismo mecanismo de `Key` visto en la sección 4, aplicado puntualmente a formularios:
+
+```dart
+final _formKey = GlobalKey<FormState>();
+
+Form(
+  key: _formKey,
+  child: Column(
+    children: [
+      TextFormField(/* ... */),
+      TextFormField(/* ... */),
+    ],
+  ),
+)
+```
+
+Cada `TextFormField` dentro del `Form` puede tener su propio **`validator`**: una función que recibe el texto actual del campo y devuelve `null` si es válido, o un `String` con el mensaje de error si no lo es. Ese mensaje aparece automáticamente debajo del campo correspondiente — no hace falta mostrarlo a mano.
+
+```dart
+TextFormField(
+  controller: _passwordController,
+  obscureText: true,
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return "La contraseña es necesaria";
+    }
+    return null;
+  },
+)
+```
+
+Para comparar el valor de dos campos entre sí (por ejemplo, que "contraseña" y "repetir contraseña" coincidan), el `validator` del segundo campo puede comparar su propio `value` contra el `.text` del controller del primero:
+
+```dart
+TextFormField(
+  controller: _repetirPasswordController,
+  obscureText: true,
+  validator: (value) {
+    if (value != _passwordController.text) {
+      return "Las contraseñas no coinciden";
+    }
+    return null;
+  },
+)
+```
+
+Con la `GlobalKey` ya asignada, `_formKey.currentState!.validate()` ejecuta el `validator` de **todos** los campos del `Form` a la vez, y devuelve `true` solo si todos pasaron. Es el patrón habitual para el botón de envío de un formulario:
+
+```dart
+FloatingActionButton(
+  onPressed: () {
+    if (_formKey.currentState!.validate()) {
+      // todos los campos son válidos: recién acá se procesan/envían los datos
+      print(_nombreController.text);
+    }
+  },
+  child: Icon(Icons.save),
+)
+```
+
+Existe también **`onSaved`**, un atributo de `TextFormField` que recibe una función y la ejecuta cuando se llama a `_formKey.currentState!.save()` — a diferencia de `onChanged` (que se dispara en cada tecleo), `save()` solo corre después de que la validación general ya pasó, y ejecuta el `onSaved` de cada campo una única vez. Sirve para recolectar los valores finales ya validados (por ejemplo, para ir armando un objeto con los datos del formulario) sin depender de leer cada `controller` por separado.
+
+> 📌 **Para el examen:** el flujo completo de `Form` + `GlobalKey<FormState>` + `validate()`, y el propósito de `onSaved` frente a `onChanged`.
+
+Antes de escribir un formulario desde cero conviene buscar una referencia de expresiones regulares ya armadas (para validar email, teléfono, etc.) en vez de reescribirlas de memoria cada vez — son fáciles de tener mal y difíciles de depurar a simple vista.
+
+## 23. `inputFormatters`: transformar y restringir lo que se escribe
+
+Mientras que `validator` evalúa el texto **después** de que el usuario terminó de escribirlo, `inputFormatters` actúa **mientras** se escribe, transformando o bloqueando directamente lo que entra al campo. Recibe una lista de `TextInputFormatter`:
+
+```dart
+TextFormField(
+  inputFormatters: [
+    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9]')),
+    FilteringTextInputFormatter.deny(RegExp(r'\s')),
+  ],
+)
+```
+
+- **`FilteringTextInputFormatter.allow(regex)`**: solo deja pasar los caracteres que matchean la expresión regular (en el ejemplo, letras y números).
+- **`FilteringTextInputFormatter.deny(regex)`**: bloquea los caracteres que matchean (en el ejemplo, espacios en blanco — útil para campos como códigos de descuento, que no deberían admitir espacios).
+
+Para transformaciones más específicas (no solo permitir/denegar, sino modificar el texto), se arma un formatter propio con `TextInputFormatter.withFunction`, que recibe el texto antes y después de cada cambio y devuelve la versión final que se debe mostrar:
+
+```dart
+TextFormField(
+  inputFormatters: [
+    TextInputFormatter.withFunction((oldValue, newValue) {
+      return newValue.copyWith(text: newValue.text.toUpperCase());
+    }),
+  ],
+)
+```
+
+Acá `newValue` es lo que el usuario acaba de escribir; `.copyWith(text: ...)` genera una copia de ese valor con el texto reemplazado (en este caso, convertido a mayúsculas), que es lo que termina mostrándose en el campo. El mismo mecanismo sirve para cualquier otra transformación en caliente del texto ingresado.
+
+## 24. Selección: `RadioListTile`, `CheckboxListTile`, `SwitchListTile`
+
+Son tres variantes de un mismo patrón: un `ListTile` (sección 17) combinado con un control de selección, para no tener que armar esa combinación a mano.
+
+**`RadioListTile`** agrupa opciones **mutuamente excluyentes** (solo se puede elegir una): cada opción tiene su propio `value`, y todas comparten una misma variable de estado (`groupValue`) que guarda cuál está seleccionada actualmente.
+
+```dart
+String? _genero;
+
+RadioListTile<String>(
+  title: Text("Masculino"),
+  value: "masculino",
+  groupValue: _genero,
+  onChanged: (value) {
+    setState(() {
+      _genero = value;
+    });
+  },
+),
+RadioListTile<String>(
+  title: Text("Femenino"),
+  value: "femenino",
+  groupValue: _genero,
+  onChanged: (value) {
+    setState(() {
+      _genero = value;
+    });
+  },
+),
+```
+
+> ⚠️ El `value` de cada opción es sensible a mayúsculas/minúsculas: si se define como `"masculino"` en una opción, `groupValue` tiene que recibir exactamente `"masculino"` (no `"Masculino"`) para que Flutter reconozca esa opción como seleccionada. La variable de estado que guarda la selección debería declararse de tipo *nullable* (`String?`) si no hay ninguna opción marcada por defecto, ya que arranca sin ningún valor asignado.
+
+**`CheckboxListTile`** es, a diferencia del radio button, un valor **booleano independiente** por cada opción (no mutuamente excluyente — se pueden marcar varias casillas a la vez, cada una vale por sí misma):
+
+```dart
+bool _recibirNotificaciones = false;
+
+CheckboxListTile(
+  title: Text("Recibir notificaciones"),
+  subtitle: Text("Novedades y actividad importante"),
+  value: _recibirNotificaciones,
+  activeColor: Colors.blue,
+  onChanged: (value) {
+    setState(() {
+      _recibirNotificaciones = value ?? false;
+    });
+  },
+)
+```
+
+**`SwitchListTile`** resuelve exactamente el mismo caso que `CheckboxListTile` (un booleano independiente), pero se muestra como un interruptor de encendido/apagado en vez de una casilla — la elección entre uno y otro es puramente de estilo visual, según qué transmita mejor la opción (por ejemplo, un interruptor se siente más natural para "perfil privado" que una casilla de verificación).
+
+En los tres casos, olvidarse del `setState()` dentro de `onChanged` tiene el mismo efecto: la variable cambia en memoria, pero la interfaz no se entera y sigue mostrando el estado anterior.
+
+Las tres variantes `...ListTile` son las más prácticas dentro de un formulario porque ya incluyen el texto (`title`) alineado junto al control. Existen también las versiones sin ese formato — `Radio`, `Checkbox` y `Switch` a secas —, que devuelven solo el control (el círculo, la casilla o el interruptor) sin ningún texto asociado; sirven para cuando el diseño necesita ese control suelto, ubicado a mano dentro de un `Row` propio junto a otro contenido, en vez del renglón completo que arma la variante `ListTile`.
+
+## 25. `DropdownButtonFormField`
+
+Despliega un menú desplegable de opciones. Sus `items` se arman típicamente a partir de una lista existente, transformando cada elemento en un `DropdownMenuItem` con `.map()` (ver `Curso-de-Dart/conceptos-dart.md`, sección de listas):
+
+```dart
+final List<String> _roles = ["Desarrollador", "Diseñador UI/UX", "Gerente de proyectos"];
+String? _rolSeleccionado;
+
+DropdownButtonFormField<String>(
+  value: _rolSeleccionado,
+  items: _roles.map((rol) {
+    return DropdownMenuItem<String>(
+      value: rol,
+      child: Text(rol),
+    );
+  }).toList(),
+  onChanged: (nuevoValor) {
+    setState(() {
+      _rolSeleccionado = nuevoValor;
+    });
+  },
+)
+```
+
+`items` necesita, puntualmente, una `List<DropdownMenuItem<T>>` — no una lista de textos sueltos. Por eso el patrón siempre es el mismo: `.map()` sobre la lista original de valores, devolviendo un `DropdownMenuItem` por cada uno, y `.toList()` al final para convertir el resultado (que `.map()` devuelve como `Iterable`, no como `List` — ver `Curso-de-Dart/conceptos-dart.md`) en la lista que el widget espera.
+
+> ⚠️ Declarar el tipo genérico explícitamente (`DropdownButtonFormField<String>`, `DropdownMenuItem<String>`) evita errores de tipo entre `dynamic` y el tipo real de los valores — un error frecuente al armar este widget es dejar que Dart infiera el tipo automáticamente y terminar con una lista de tipo `dynamic` que no calza con lo que `DropdownButtonFormField` espera.
+
+## 26. Formularios largos: `Stepper` y `AutofillGroup`
+
+Dos widgets orientados a formularios más largos o complejos, con una API propia más amplia que la de un `TextFormField` suelto:
+
+- **`Stepper`**: divide un formulario largo en pasos secuenciales (por ejemplo: datos personales → dirección → confirmación), mostrando de a un paso por vez y validando cada uno antes de dejar avanzar al siguiente. Resuelve el problema de un formulario largo que se siente abrumador si se muestra todo junto en una sola pantalla.
+- **`AutofillGroup`**: envuelve un grupo de campos para habilitar el autocompletado nativo del sistema operativo — el mismo mecanismo que sugiere datos guardados de tarjetas, direcciones o contraseñas en otras apps y en el navegador. Cada `TextFormField` dentro del grupo indica, con el atributo `autofillHints`, qué tipo de dato espera (una lista de constantes `AutofillHints`, como `AutofillHints.email` o `AutofillHints.password`), para que el sistema operativo entienda cuáles campos guardados le corresponden a cada caja — por ejemplo, que el correo ingresado en un campo pertenece a la contraseña ingresada en otro. Al enviar el formulario se llama a `TextInput.finishAutofillContext()`, que le indica al sistema operativo que el usuario terminó de completar los datos — es lo que dispara la ventana emergente típica de "¿Deseas guardar esta contraseña?" en el teléfono.
+
+Ninguno de los dos formaba parte de una caja de texto simple y quedan para retomar con más detalle en la práctica — vale saber que existen y qué problema resuelve cada uno para reconocerlos al verlos en código ajeno o en la documentación.
+
+---
+
+*Fuentes puntuales de esta sección: quiz de repaso de [`TextFormField` (Código Facilito)](https://codigofacilito.com/quizzes/formularios_flutter) y el [artículo de validaciones en Flutter de Código Facilito](https://codigofacilito.com/articulos/articulo_28_10_2019_17_58_51).*

@@ -5,38 +5,54 @@ Una línea por clase real, en el orden en que se dictaron. El detalle técnico d
 ## Módulo 1: Introducción
 
 * **Clase 1 — Inauguración: fundamentos de desarrollo móvil**
-  - **Contenido:** clase teórica introductoria sobre los fundamentos del desarrollo de apps móviles.
+  - **Contenido:** fundamentos de desarrollo móvil.
 
   → Detalle completo en [`fundamentos/conceptos.md`](./fundamentos/conceptos.md)
 
 * **Clase 2 — Instalación de herramientas de desarrollo**
-  - **Contenido:** instalación y configuración del entorno de trabajo (Flutter SDK, Android Studio y plugins). Sin contenido conceptual nuevo.
+  - **Contenido:** instalación de Flutter SDK, Android Studio y plugins. Sin contenido conceptual nuevo.
 
 ## Módulo 2: Introducción a Dart
 
 * **Clase 3 — Repaso de Dart y ejercicios prácticos**
-  - **Contenido:** repaso general de los conceptos básicos de Dart y práctica guiada resolviendo ejercicios en una plataforma en vivo.
+  - **Contenido:** repaso de Dart y ejercicios en una plataforma en vivo.
 
   → Detalle completo en [`Curso-de-Dart/conceptos-dart.md`](https://github.com/DantheonHub/Curso-de-Dart/blob/main/conceptos-dart.md)
 
-  - **Actividades asignadas:** continuar resolviendo por cuenta propia los ejercicios de repaso pendientes (carpeta de "primeros pasos" del curso).
+  - **Actividades asignadas:** ejercicios de repaso pendientes (carpeta "primeros pasos" del curso).
 
-  > Recordatorio de instalar los plugins de Dart y Flutter en Android Studio para quien no lo haya hecho en la Clase 2.
+  > Instalar los plugins de Dart y Flutter en Android Studio para quien no lo haya hecho en la Clase 2.
 
 * **Clase 4 — Programación asíncrona con Dart**
-  - **Contenido:** repaso breve de POO y programación asíncrona en Dart (`Future`, `async`/`await`, `Stream`, concurrencia vs. paralelismo, isolates). Contenido de Dart puro — el detalle completo está en [`Curso-de-Dart/conceptos-dart.md`](https://github.com/DantheonHub/Curso-de-Dart/blob/main/conceptos-dart.md), sección "Programación asíncrona".
-  - **Actividades asignadas:** practicar simulando la descarga de datos con un `Future`, generando un `Stream` propio y filtrándolo con `where`.
+  - **Contenido:** POO (repaso) y programación asíncrona (`Future`, `async`/`await`, `Stream`, concurrencia vs. paralelismo, isolates).
+
+  → Detalle completo en [`Curso-de-Dart/conceptos-dart.md`](https://github.com/DantheonHub/Curso-de-Dart/blob/main/conceptos-dart.md), sección "Programación asíncrona"
+
+  - **Actividades asignadas:** simular una descarga con `Future`, generar un `Stream` propio y filtrarlo con `where`.
 
 ## Módulo 3: Introducción a Flutter
 
 * **Clase 5 — Introducción a Flutter (Parte 1)**
-  - **Contenido:** primeros pasos con Flutter — qué es un widget, jerarquía y árbol de widgets, `BuildContext`, `Key`, diferencia entre `StatelessWidget` y `StatefulWidget`, `Scaffold`/`AppBar`, widgets Material y Cupertino, widgets básicos de texto e íconos.
+  - **Contenido:** widgets, árbol de widgets, `BuildContext`, `Key`, `StatelessWidget` vs. `StatefulWidget`, `Scaffold`/`AppBar`, Material vs. Cupertino, texto e íconos.
 
   → Detalle completo en [`flutter/conceptos.md`](./flutter/conceptos.md)
 
 * **Clase 6 — Introducción a Flutter (Parte 2)**
-  - **Contenido:** widgets `Card` y `Container` en profundidad (decoración, bordes, degradados, imagen de fondo), interactividad (`InkWell`/`GestureDetector`), `ListTile`, menús de navegación (`Drawer` y `BottomNavigationBar`) y ventanas flotantes (`AlertDialog` y `showModalBottomSheet`).
+  - **Contenido:** `Card` y `Container` (decoración, bordes, degradados, imagen de fondo), `InkWell`/`GestureDetector`, `ListTile`, `Drawer`, `BottomNavigationBar`, `AlertDialog`, `showModalBottomSheet`.
 
   → Detalle completo en [`flutter/conceptos.md`](./flutter/conceptos.md)
 
-  - **Actividades asignadas:** recrear un diseño de tarjeta (`Card`) tipo "credit card" y un `Container` tipo "plan" con degradado, borde, sombra, `Divider` y `ListTile` — enunciados en las diapositivas de la clase.
+  - **Actividades asignadas:** recrear un `Card` tipo "credit card" y un `Container` tipo "plan" (degradado, borde, sombra, `Divider`, `ListTile`) — diapositivas de la clase.
+
+  > Mencionado en clase, para más adelante (al ver MVVM/Clean Architecture): separar en carpetas distintas los widgets reutilizables de las pages.
+
+## Módulo 4: Listas y formularios
+
+* **Clase 7 — Widgets mutables: crear un formulario y validar**
+  - **Contenido:** `TextEditingController` y atributos de `TextFormField` (`decoration`, `keyboardType`, `textInputAction`/`onFieldSubmitted`, `obscureText`, `enabled`, `maxLength`, `maxLines`, `onChanged`); `inputFormatters` (forzar mayúsculas, permitir/denegar caracteres con expresiones regulares); `Form` + `GlobalKey<FormState>` + `validate()`; `validator` por campo, incluida comparación entre dos campos (contraseña/repetir contraseña); `onSaved`; selección con `RadioListTile`, `CheckboxListTile` y `SwitchListTile`; `DropdownButtonFormField`. Quiz en vivo sobre los atributos de `TextFormField` (quedaron marcados como tema de examen en `conceptos.md`). Se mencionaron `Stepper` y `AutofillGroup` sin desarrollarlos en profundidad por tiempo — código para revisar por cuenta propia. Arranca Módulo 4 — queda pendiente su segunda clase.
+
+  → Detalle completo en [`flutter/conceptos.md`](./flutter/conceptos.md)
+
+  - **Actividades asignadas:** revisar por cuenta propia el código completo compartido por la cátedra (formulario con todos los atributos comentados, y los widgets de `Stepper`/`AutofillGroup`).
+
+  > Se recomienda repasar la grabación de la clase antes del examen, especialmente la parte de validaciones. Dudas puntuales, por el canal de Telegram del bootcamp.

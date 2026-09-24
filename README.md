@@ -20,9 +20,7 @@ El contenido está organizado como una **biblioteca de conceptos**: un archivo `
 📁 flutter/
    📄 conceptos.md
 📄 bitacora.md
-📄 cronograma.md
 📄 README.md
-📄 .gitignore
 ```
 
 - Cada carpeta corresponde a un área temática del bootcamp (no a un módulo puntual del calendario), y contiene su propio `conceptos.md` con índice interno.
