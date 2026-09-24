@@ -56,3 +56,14 @@ Una línea por clase real, en el orden en que se dictaron. El detalle técnico d
   - **Actividades asignadas:** revisar por cuenta propia el código completo compartido por la cátedra (formulario con todos los atributos comentados, y los widgets de `Stepper`/`AutofillGroup`).
 
   > Se recomienda repasar la grabación de la clase antes del examen, especialmente la parte de validaciones. Dudas puntuales, por el canal de Telegram del bootcamp.
+
+* **Clase 8 — Trabajando con arreglos y componentes de listas**
+  - **Contenido:** `ListView` estático, `ListView.builder` (`itemCount`/`itemBuilder`) y `ListView.separated` (`separatorBuilder`); atributos `padding`, `itemExtent`, `reverse`, `physics` (`BouncingScrollPhysics`, `ClampingScrollPhysics`, `NeverScrollableScrollPhysics`, `AlwaysScrollableScrollPhysics`) y `shrinkWrap`; lista horizontal con `scrollDirection`; listas dentro de listas (`shrinkWrap` + `NeverScrollableScrollPhysics`); `GridView.count` y `GridView.builder` (`SliverGridDelegateWithFixedCrossAxisCount`, `crossAxisSpacing`/`mainAxisSpacing`); modelo `User` con `copyWith`, lista de objetos y CRUD en memoria (`add`, `remove`, `indexWhere`, `setState`), con un único método `saveUser` para crear/editar y formulario reutilizable en un `AlertDialog` (`null` = crear); manejo de nulos (`?`, `!`, `late`) y convención `snake_case` para archivos. Quiz en vivo sobre los atributos de `ListView` (quedaron marcados como tema de examen en `conceptos.md`). El CRUD (guardar, editar, eliminar) se retoma más adelante con base de datos y consumo de servicios web.
+
+  → Detalle completo en [`flutter/conceptos.md`](./flutter/conceptos.md)
+
+  - **Actividades asignadas:** replicar un diseño con una lista padre que contiene un `GridView` de 4 columnas, una lista horizontal y una lista vertical; y un `ListView.builder` simple. Código del CRUD compartido por la cátedra para practicar.
+
+  > El quiz se puede repetir las veces que se quiera. Diapositivas, quiz y código de la clase en el repo de la profesora ([`Marines0210/bootcamp_flutter`](https://github.com/Marines0210/bootcamp_flutter)).
+  >
+  > Mencionado en clase, para más adelante: CRUD genérico con abstracción y polimorfismo (al ver patrones arquitectónicos) y cantidad de columnas del `GridView` según dispositivo (al ver app responsiva).
