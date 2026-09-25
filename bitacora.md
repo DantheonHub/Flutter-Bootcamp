@@ -76,3 +76,12 @@ Una línea por clase real, en el orden en que se dictaron. El detalle técnico d
   - **Actividades asignadas:** hacer el quiz de la clase (se puede repetir las veces que se quiera) y practicar generando una paleta propia con alguno de los dos generadores, o usando la paleta de ejemplo de la clase, para aplicarla en el proyecto.
 
   > Diapositivas, PDF con los colores de ejemplo y código de la clase en el repo de la profesora ([`Marines0210/bootcamp_flutter`](https://github.com/Marines0210/bootcamp_flutter)). Dudas y resultados del quiz, por el canal de Telegram del bootcamp.
+
+* **Clase 10 — Responsividad móvil y web, y app multidioma**
+  - **Contenido:** widgets de distribución flexible (`Expanded`, `Flexible` con `flex`/`fit`, `Wrap`, `FractionallySizedBox`, `AspectRatio`, `FittedBox`) y el error `RenderFlex overflowed`; medición con `MediaQuery` (tamaño y orientación) y `LayoutBuilder` (restricciones del padre); puntos de quiebre (móvil/tablet/escritorio/web) definidos como constantes y una clase `Responsive`; patrones adaptativos (Master-Detail, Reflow, Shift Data, Disconnect, Expand/Stretch); paquete `flutter_screenutil_plus` (`ScreenUtilPlusInit`, `designSize`, extensiones `.w`/`.h`/`.r`/`.sp`, `ResponsiveBuilder` con breakpoints `xs`/`sm`/`md`/`lg`/`xl`) como alternativa empaquetada a la implementación manual. Quiz en vivo sobre la característica principal de cada widget de distribución flexible (quedó marcado como tema de examen en `conceptos.md`). No se llegó al tema de apps multidioma anunciado en el título de la clase.
+
+  → Detalle completo en [`flutter/conceptos.md`](./flutter/conceptos.md)
+
+  - **Actividades asignadas:** actividad de Master-Detail escalable con `flutter_screenutil_plus` (mostrar una lista si es móvil o tablet, y un master-detail si es escritorio o web; usar `.sp` para los textos y `.w`/`.h` para los contenedores) — resuelta por cuenta propia, sin subir al repo.
+
+  > Diapositivas y código de la clase en el repo de la profesora ([`Marines0210/bootcamp_flutter`](https://github.com/Marines0210/bootcamp_flutter)). Sin clase la semana siguiente; próxima clase el martes 22.

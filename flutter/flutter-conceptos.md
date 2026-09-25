@@ -49,8 +49,16 @@ Bootcamp de Desarrollo de Apps Móviles con Flutter — Código Facilito — Pro
   - [35. `ThemeData`, tema global y modo claro/oscuro](#35-themedata-tema-global-y-modo-clarooscuro)
   - [36. Tipografía: escala de Material 3 y `textTheme`](#36-tipografía-escala-de-material-3-y-texttheme)
   - [37. Temas de componentes: botones, `Card` y `AppBar`](#37-temas-de-componentes-botones-card-y-appbar)
+  - [38. Diseño responsivo: el problema y las herramientas](#38-diseño-responsivo-el-problema-y-las-herramientas)
+  - [39. `Expanded` y `Flexible`](#39-expanded-y-flexible)
+  - [40. `Wrap`](#40-wrap)
+  - [41. `FractionallySizedBox` y `AspectRatio`](#41-fractionallysizedbox-y-aspectratio)
+  - [42. `FittedBox` y cómo elegir el widget](#42-fittedbox-y-cómo-elegir-el-widget)
+  - [43. `MediaQuery`, `LayoutBuilder` y puntos de quiebre](#43-mediaquery-layoutbuilder-y-puntos-de-quiebre)
+  - [44. Patrones adaptativos](#44-patrones-adaptativos)
+  - [45. Textos y contenedores adaptables: `flutter_screenutil_plus`](#45-textos-y-contenedores-adaptables-flutter_screenutil_plus)
 
-**Repaso rápido para el examen:** [21](#21-texteditingcontroller-y-atributos-de-textformfield) · [22](#22-form-globalkeyformstate-y-validación) · [28](#28-atributos-de-listview) · [37](#37-temas-de-componentes-botones-card-y-appbar)
+**Repaso rápido para el examen:** [21](#21-texteditingcontroller-y-atributos-de-textformfield) · [22](#22-form-globalkeyformstate-y-validación) · [28](#28-atributos-de-listview) · [37](#37-temas-de-componentes-botones-card-y-appbar) · [43](#43-mediaquery-layoutbuilder-y-puntos-de-quiebre)
 
 ---
 
@@ -1813,3 +1821,343 @@ Cada widget creado a partir de ahí toma ese estilo, y cambiarlo se resuelve en 
 ---
 
 *Fuentes puntuales de las secciones 32 a 37: documentación oficial de Flutter — [`Colors`](https://api.flutter.dev/flutter/material/Colors-class.html), [`ColorScheme.background` (deprecado a favor de `surface`)](https://api.flutter.dev/flutter/material/ColorScheme/background.html), [`ThemeData`](https://api.flutter.dev/flutter/material/ThemeData/ThemeData.html) y [«Use themes to share colors and font styles»](https://docs.flutter.dev/cookbook/design/themes.html); y la documentación del paquete [`google_fonts`](https://pub.dev/documentation/google_fonts/latest/index.html).*
+
+---
+
+## 38. Diseño responsivo: el problema y las herramientas
+
+Una app tiene que verse bien en pantallas de tamaños muy distintos: móvil, tablet, escritorio y navegador. El síntoma de un diseño que no se adapta es el patrón de rayas amarillas y negras con el mensaje `A RenderFlex overflowed by N pixels` (sección 22): un widget ocupa más espacio del que tiene disponible. Un diseño responsivo no muestra ese error al achicar la ventana ni deja espacios vacíos o elementos estirados al agrandarla.
+
+Para comprobarlo conviene ejecutar la app en el navegador (`flutter run -d chrome`; si el proyecto no tiene la carpeta `web`, se agrega con `flutter create . --platforms=web`) y cambiar el tamaño de la ventana mientras se observa el diseño.
+
+Las herramientas se organizan en cinco grupos:
+
+| Grupo | Para qué sirve | Sección |
+|---|---|---|
+| Widgets de distribución flexible (`Expanded`, `Flexible`, `Wrap`, `FractionallySizedBox`, `AspectRatio`, `FittedBox`) | Que los elementos se adapten al espacio disponible sin desbordarse | 39 a 42 |
+| Medición y restricciones (`MediaQuery`, `LayoutBuilder`) | Conocer el tamaño de la pantalla o del espacio que asigna el padre | 43 |
+| Puntos de quiebre (*breakpoints*) | Definir a partir de qué ancho cambia el diseño | 43 |
+| Patrones adaptativos | Elegir cómo se reorganiza la interfaz en cada tamaño | 44 |
+| Textos y contenedores adaptables (`flutter_screenutil_plus`) | Escalar tamaños de fuente, anchos, altos y radios según la pantalla | 45 |
+
+## 39. `Expanded` y `Flexible`
+
+Ambos reparten el espacio disponible dentro de un `Row`, una `Column` o un `Flex`. Se usan cuando un hijo tiene un tamaño fijo mayor que el espacio que le queda (un contenedor de 900 de ancho en una pantalla de 500 desborda) o cuando se quiere repartir el ancho o el alto entre varios elementos.
+
+**`Expanded`** hace que el hijo ocupe **todo el espacio sobrante** en el eje principal del `Row`/`Column`. Si hay varios `Expanded`, se reparten el espacio en partes iguales, y el `width` fijo de cada hijo deja de tener efecto sobre ese eje:
+
+```dart
+Row(
+  children: [
+    Expanded(child: Container(height: 100, color: Colors.red)),
+    Expanded(child: Container(height: 100, color: Colors.blue)),
+  ],
+)
+```
+
+**`Flexible`** también reparte el espacio, pero con más control:
+
+- `flex`: proporción del espacio que recibe cada hijo. Con `flex: 1` y `flex: 2`, el primero ocupa un tercio y el segundo dos tercios (`Expanded` también acepta `flex`).
+- `fit`: define cómo se comporta el hijo dentro del espacio asignado. Con `FlexFit.loose` (el valor por defecto) el hijo **respeta su propio tamaño** y solo se encoge si falta lugar. Con `FlexFit.tight` se estira para ocupar todo su espacio asignado, y en ese caso equivale a `Expanded` (`Expanded` es, de hecho, un `Flexible` con `fit: FlexFit.tight`).
+
+```dart
+Row(
+  children: [
+    // Respeta sus 50 de ancho
+    Flexible(child: Container(width: 50, height: 50, color: Colors.red)),
+    // Se estira hasta ocupar su parte del espacio
+    Flexible(
+      fit: FlexFit.tight,
+      child: Container(width: 50, height: 50, color: Colors.blue),
+    ),
+  ],
+)
+```
+
+**Cuándo usar cada uno.** `Expanded` cuando el hijo debe llenar el espacio sobrante; `Flexible` cuando el hijo debe conservar su tamaño natural pero poder encogerse si falta espacio, o cuando hace falta repartir por proporciones.
+
+El caso más habitual es una fila con un elemento de tamaño fijo y un texto largo: los elementos fijos van primero y el que puede crecer o achicarse se envuelve en `Expanded` o `Flexible`, de modo que el texto se acomode en varias líneas en lugar de salirse de la pantalla:
+
+```dart
+Row(
+  children: [
+    const Icon(Icons.person, size: 40),
+    Expanded(
+      child: Text("Un texto muy largo que no debería salirse de la pantalla"),
+    ),
+  ],
+)
+```
+
+> ⚠️ `Expanded` y `Flexible` solo pueden ser **hijos directos** de un `Row`, una `Column` o un `Flex`. Si se colocan dentro de otro widget intermedio (un `Container` o un `Padding` que a su vez está dentro del `Row`), Flutter lanza el error `Incorrect use of ParentDataWidget`. Por eso tampoco se pueden aplicar a un `Text` suelto: el texto tiene que estar dentro de un `Row` o una `Column`, y ahí sí se lo envuelve.
+
+## 40. `Wrap`
+
+`Wrap` organiza sus hijos en línea y, cuando ya no hay lugar, **los pasa a la línea siguiente**. A diferencia de un `Row`, no desborda ni tiene scroll: reacomoda los elementos, que conservan su tamaño.
+
+```dart
+Wrap(
+  spacing: 8,      // separación entre elementos de una misma línea
+  runSpacing: 8,   // separación entre líneas
+  children: List.generate(
+    10,
+    (i) => Container(
+      width: 200,
+      height: 50,
+      color: Colors.amber,
+      child: Center(child: Text("Elemento $i")),
+    ),
+  ),
+)
+```
+
+Con diez contenedores de 200 de ancho, un `Row` desborda en una pantalla chica; un `Wrap` los distribuye en tantas filas como haga falta. Es útil cuando basta con visualizar todos los elementos sin necesidad de scroll. La alternativa es un scroll horizontal para recorrerlos, o `Expanded` (que los encoge todos, hasta volverlos muy pequeños). Para muchos elementos uniformes, un `GridView` (sección 30) cumple la misma función.
+
+## 41. `FractionallySizedBox` y `AspectRatio`
+
+**`FractionallySizedBox`** hace que el hijo ocupe un **porcentaje del tamaño de su padre**, expresado como factor entre 0 y 1: `widthFactor: 0.8` es el 80 % del ancho disponible; `heightFactor: 0.2`, el 20 % del alto. A diferencia de un ancho fijo (300 píxeles siempre), el tamaño crece y decrece con el padre: si el padre mide 1000, el hijo con `0.8` mide 800; si el padre mide 500, mide 400.
+
+```dart
+Container(
+  width: double.infinity,
+  height: 100,
+  color: Colors.blue,
+  child: FractionallySizedBox(
+    widthFactor: 0.8,
+    heightFactor: 0.2,
+    child: Container(color: Colors.orange, child: const Text("80 % del ancho")),
+  ),
+)
+```
+
+Con `alignment` (centrado por defecto) se posiciona el hijo dentro del espacio del padre. Sirve para que una tarjeta o un contenedor ocupe siempre una fracción de la pantalla, sin fijar valores absolutos.
+
+**`AspectRatio`** fuerza al hijo a mantener una **relación de aspecto** (ancho / alto) sin importar el tamaño que imponga el padre. Un widget de ancho y alto fijos se deforma cuando el espacio cambia (el ancho crece y el alto no, y una imagen queda estirada); con `AspectRatio` el ancho se adapta al espacio disponible y el alto se calcula a partir de la proporción, de modo que ambos crecen juntos:
+
+```dart
+AspectRatio(
+  aspectRatio: 16 / 9,
+  child: Image.asset("assets/img/portada.jpg", fit: BoxFit.cover),
+)
+```
+
+| Relación | Uso típico |
+|---|---|
+| `16 / 9` | Reproductores de video (YouTube, Netflix): evita que el video se estire o se deforme |
+| `1 / 1` (`aspectRatio: 1.0`) | Avatares y fotos de perfil circulares o cuadradas; publicaciones cuadradas tipo Instagram |
+| `4 / 5` | Publicaciones ligeramente verticales de un feed |
+| `2 / 1` o `3 / 1` | Banners promocionales muy anchos y poco altos, como el de la parte superior de una tienda online |
+
+## 42. `FittedBox` y cómo elegir el widget
+
+**`FittedBox`** **escala** a su hijo (un texto, una imagen, o todo un diseño) para que entre en el espacio disponible sin desbordarse ni cortarse. Por defecto usa `BoxFit.contain`: reduce (o agranda) el contenido manteniendo sus proporciones hasta que calce en el espacio que le da el padre.
+
+```dart
+Container(
+  width: 200,
+  height: 200,
+  color: Colors.grey.shade300,
+  child: FittedBox(
+    child: Image.asset("assets/img/foto_grande.jpg"), // imagen de 1000 × 2000
+  ),
+)
+```
+
+Sin el `FittedBox`, la imagen de 1000 × 2000 se sale del contenedor de 200 × 200 y aparecen las rayas de error; con él, toda la imagen se reduce para caber. Se usa también con un texto de una sola línea que debe achicarse en lugar de cortarse.
+
+La diferencia con `Expanded` es de fondo: `Expanded` cambia el **tamaño del widget** para que llene el espacio, mientras que `FittedBox` **escala el contenido completo** (texto e imágenes incluidos) para que quepa.
+
+Cada uno de estos widgets se distingue por una característica principal:
+
+| Widget | Característica principal | Se usa cuando... |
+|---|---|---|
+| `Expanded` | Ocupa todo el espacio sobrante en un `Row`/`Column` | Un elemento se sale de la pantalla o debe llenar el espacio restante |
+| `Flexible` | Reparte por proporción (`flex`); con `loose` respeta el tamaño del hijo | Se necesita repartir por proporciones o conservar el tamaño natural |
+| `Wrap` | Pasa los elementos a la línea siguiente cuando no caben | Hay varios elementos en fila que no deben desbordar |
+| `FractionallySizedBox` | Toma un porcentaje del tamaño del padre | El hijo debe ocupar una fracción de la pantalla |
+| `AspectRatio` | Mantiene la relación ancho/alto | Videos, avatares, banners e imágenes que no deben deformarse |
+| `FittedBox` | Escala el contenido para que quepa | Un contenido de tamaño fijo no debe salirse de su contenedor |
+
+## 43. `MediaQuery`, `LayoutBuilder` y puntos de quiebre
+
+**`MediaQuery`** entrega información sobre la pantalla: su tamaño y su orientación. Requiere el `BuildContext`:
+
+```dart
+final mediaQueryData = MediaQuery.of(context);
+final screenWidth = mediaQueryData.size.width;
+final screenHeight = mediaQueryData.size.height;
+final orientation = mediaQueryData.orientation; // Orientation.portrait o .landscape
+```
+
+Las medidas están en **píxeles lógicos** (dp), independientes de la densidad de la pantalla: un móvil de alta gama con una resolución física enorme sigue reportando un ancho pequeño en píxeles lógicos, por lo que no se confunde con una tablet o un monitor. `MediaQuery.sizeOf(context)` obtiene solo el tamaño y hace que el widget se reconstruya únicamente cuando el tamaño cambia.
+
+**Puntos de quiebre (*breakpoints*).** Son los límites de ancho en los que la interfaz cambia de diseño. Una convención habitual:
+
+| Dispositivo | Ancho de pantalla |
+|---|---|
+| Móvil | Menor a 600 |
+| Tablet | Entre 600 y 1024 |
+| Escritorio | Entre 1024 y 1366 |
+| Web | Mayor a 1366 |
+
+Conviene definir esos valores una sola vez, como constantes (por convención, con el prefijo `k` y en `camelCase`, lo que permite encontrarlas todas escribiendo `k` en el autocompletado), y una clase utilitaria que responda a qué tipo de dispositivo corresponde el ancho actual:
+
+```dart
+// utils/constants.dart
+const double kMobileBreakpoint = 600;
+const double kTabletBreakpoint = 1024;
+const double kDesktopBreakpoint = 1366;
+```
+
+```dart
+// utils/responsive.dart
+class Responsive {
+  static bool isMobile(BuildContext context) =>
+      MediaQuery.of(context).size.width <= kMobileBreakpoint;
+
+  static bool isTablet(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return width > kMobileBreakpoint && width <= kTabletBreakpoint;
+  }
+
+  static bool isDesktop(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return width > kTabletBreakpoint && width <= kDesktopBreakpoint;
+  }
+
+  static bool isWeb(BuildContext context) =>
+      MediaQuery.of(context).size.width > kDesktopBreakpoint;
+}
+```
+
+**`LayoutBuilder`** construye un widget a partir de las **restricciones** (ancho y alto máximos) que le asigna su padre: recibe `(context, constraints)`. Es un `builder` como el de `ListView.builder`, pero en lugar de construir elementos según un índice, construye un diseño según el espacio disponible, y se vuelve a ejecutar cada vez que ese espacio cambia. Si el padre es un contenedor de 1000 de ancho, `constraints.maxWidth` vale 1000, aunque la pantalla sea más ancha. `MediaQuery` informa el tamaño de la pantalla; `LayoutBuilder`, el del espacio que le toca a ese fragmento del diseño.
+
+Combinados con los puntos de quiebre, permiten devolver un diseño distinto por tipo de dispositivo:
+
+```dart
+class ProductosView extends StatelessWidget {
+  const ProductosView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (Responsive.isMobile(context)) {
+          return const ProductosMovil();
+        } else if (Responsive.isTablet(context)) {
+          return const ProductosTablet();
+        } else if (Responsive.isDesktop(context)) {
+          return const ProductosEscritorio();
+        }
+        return const ProductosWeb();
+      },
+    );
+  }
+}
+```
+
+(`ProductosMovil`, `ProductosTablet`, etc. son los widgets que arma cada diseño.)
+
+En móvil también hay que contemplar la **orientación**: una tarjeta o lista pensada para vertical se estira demasiado al girar el dispositivo. Una solución es mostrar una sola columna en vertical (`portrait`) y dos en horizontal (`landscape`), por ejemplo con un `GridView`.
+
+## 44. Patrones adaptativos
+
+Los patrones adaptativos permiten que una app cambie su diseño, estructura y comportamiento según el tamaño de la pantalla (móvil, tablet, escritorio) o la plataforma (iOS o Android). El punto de quiebre decide *cuándo* cambiar; el patrón decide *cómo* se reorganiza la interfaz.
+
+| Patrón | Descripción | Ideal para |
+|---|---|---|
+| Master-Detail (Maestro-Detalle) | Pantalla dividida: a la izquierda una lista (maestro) y a la derecha el contenido (detalle). En pantallas chicas se separan en dos páginas | Mensajería, emails, ajustes |
+| Reflow (Redistribución) | Los elementos verticales se reordenan horizontalmente (o viceversa) al cambiar el espacio | Cuadrículas de productos, formularios |
+| Shift Data (Desplazamiento) | Mueve secciones secundarias (como barras de herramientas) a menús ocultos o cajones (`Drawer`) en pantallas pequeñas | Paneles de control (*dashboards*) |
+| Disconnect (Desconexión) | Separa interfaces complejas en pestañas (`Tabs`) o en pasos secuenciales en móviles | Procesos de pago (*checkout*), perfiles |
+| Expand/Stretch (Expansión) | Los contenedores crecen hasta un límite máximo (`BoxConstraints`) para no perder la proporción estética | Tarjetas de contenido, banners |
+
+**Master-Detail** es el que usan WhatsApp o Gmail: en el móvil se ve la lista de chats y, al tocar uno, se abre el detalle en otra pantalla; en la web, la lista queda a un lado y el chat al otro. Como ambas partes ya existen como widgets, en pantallas anchas alcanza con colocarlas una al lado de la otra, por ejemplo con `Expanded` y una proporción 30/70, en vez de navegar a otra página:
+
+```dart
+Row(
+  children: [
+    Expanded(flex: 3, child: ListaMaestro()),
+    Expanded(flex: 7, child: Detalle()),
+  ],
+)
+```
+
+## 45. Textos y contenedores adaptables: `flutter_screenutil_plus`
+
+Los widgets anteriores adaptan la *distribución*; los tamaños de texto, márgenes, anchos y radios seguirían siendo fijos (un texto de tamaño 24 se ve pequeño en una pantalla grande). **`flutter_screenutil_plus`** escala esos valores en proporción al tamaño de la pantalla. Es una versión extendida y actualizada del paquete `flutter_screenutil` y, además de las extensiones de tamaño, incluye un `ResponsiveBuilder` que resuelve los puntos de quiebre.
+
+Se agrega con `flutter pub add flutter_screenutil_plus`. Como el paquete se actualiza seguido y exige un Flutter reciente, si la instalación falla por versiones conviene ejecutar `flutter pub upgrade`.
+
+**Inicialización.** El paquete necesita conocer el tamaño de pantalla para el que se diseñó la interfaz (`designSize`, en dp). Todos los valores se escalan tomando ese tamaño como referencia. Se envuelve la app con `ScreenUtilPlusInit`, y el `MaterialApp` se devuelve desde el `builder` (recibe la pantalla inicial como `child`):
+
+```dart
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ScreenUtilPlusInit(
+      designSize: const Size(360, 690), // tamaño de referencia del diseño
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          home: child,
+        );
+      },
+      child: const HomeScreen(),
+    );
+  }
+}
+```
+
+- `designSize`: tamaño en dp de la pantalla del diseño original; 360 × 690 es un tamaño de móvil estándar.
+- `minTextAdapt: true`: hace que el texto se adapte tomando el menor entre el ancho y el alto. Sin este atributo, los tamaños de fuente no se reescalan.
+- El `MaterialApp` va dentro de `builder`, no como un `child` fijo: el `builder` se vuelve a ejecutar cuando cambia el tamaño de la pantalla, mientras que un `child` fijo genera un diseño que no se reconstruye.
+
+**Extensiones numéricas.** Se escriben a continuación del número:
+
+| Extensión | Escala | Ejemplo |
+|---|---|---|
+| `.w` | Ancho, según el ancho de pantalla | `100.w` |
+| `.h` | Alto, según el alto de pantalla | `50.h` |
+| `.r` | Según el menor entre ancho y alto: radios y elementos cuadrados | `12.r` |
+| `.sp` | Tamaño de fuente | `24.sp` |
+
+```dart
+Container(
+  width: 100.w,
+  height: 50.h,
+  padding: EdgeInsets.all(16.r),
+  child: Text("Hola mundo", style: TextStyle(fontSize: 24.sp)),
+)
+```
+
+Con esto el contenedor crece o se achica con la pantalla, y sus hijos se adaptan junto con él. Para los textos se usa `.sp` en lugar de `.w`. También sirve para radios (un avatar circular con `CircleAvatar(radius: 30.r)` mantiene la proporción). Combinado con `Expanded`/`Flexible` (sección 39), evita que un texto que crece salga del contenedor.
+
+> ⚠️ El paquete reconstruye automáticamente los widgets propios que usan `.w`, `.h` o `.sp`, salvo los privados (con nombre que empieza por `_`). Un widget privado que usa estas extensiones necesita el mixin `SU` (`class _MiWidget extends StatelessWidget with SU`) o su nombre en la lista `responsiveWidgets` de `ScreenUtilPlusInit`; de lo contrario no se reescala al cambiar la pantalla.
+
+**`ResponsiveBuilder`.** Reemplaza al `if / else if` con `LayoutBuilder` de la sección 43: cada parámetro corresponde a un punto de quiebre y devuelve el diseño de ese tamaño.
+
+```dart
+ResponsiveBuilder(
+  xs: (context) => const ProductosMovil(),
+  sm: (context) => const ProductosMovilHorizontal(),
+  md: (context) => const ProductosTablet(),
+  lg: (context) => const ProductosEscritorio(),
+  xl: (context) => const ProductosWeb(),
+)
+```
+
+- `xs` es el móvil en vertical, `sm` el móvil en horizontal (*landscape*), `md` la tablet, `lg` el escritorio y `xl` la web. Los puntos de quiebre no definidos usan el más cercano disponible.
+- Los puntos de quiebre por defecto del paquete siguen la convención de Bootstrap 5 (`sm` desde 576, `md` desde 768, `lg` desde 992, `xl` desde 1200) y el paquete admite otros conjuntos predefinidos (Tailwind, Material Design) o `Breakpoints` propios. No coinciden con los 600/1024/1366 de la sección 43 salvo que se personalicen.
+- Como el paquete resuelve la comparación de anchos, ya no hace falta escribir la condición en cada pantalla (detalle, inicio, *dashboard*): cada una devuelve directamente su diseño por tamaño.
+
+**Implementación propia frente a un paquete.** Un paquete ahorra trabajo, pero puede dejar de mantenerse o dar problemas de compatibilidad. Conocer cómo se resuelve a mano (`MediaQuery` + puntos de quiebre + `LayoutBuilder`, sección 43) permite reemplazar el paquete sin rehacer el proyecto.
+
+---
+
+*Fuentes puntuales de las secciones 38 a 45: documentación del paquete [`flutter_screenutil_plus`](https://pub.dev/packages/flutter_screenutil_plus) en pub.dev, y diapositivas de la cátedra de la clase de responsividad.*
