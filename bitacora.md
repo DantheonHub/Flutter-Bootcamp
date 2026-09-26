@@ -85,3 +85,28 @@ Una línea por clase real, en el orden en que se dictaron. El detalle técnico d
   - **Actividades asignadas:** actividad de Master-Detail escalable con `flutter_screenutil_plus` (mostrar una lista si es móvil o tablet, y un master-detail si es escritorio o web; usar `.sp` para los textos y `.w`/`.h` para los contenedores) — resuelta por cuenta propia, sin subir al repo.
 
   > Diapositivas y código de la clase en el repo de la profesora ([`Marines0210/bootcamp_flutter`](https://github.com/Marines0210/bootcamp_flutter)). Sin clase la semana siguiente; próxima clase el martes 22.
+
+* **Clase 11 — Lineamientos de proyecto final**
+  - **Contenido:** clase sin material técnico nuevo; requisitos y entregables del proyecto final del bootcamp (fecha de entrega, criterios de evaluación y opciones sugeridas), a mitad de la cursada. Se evalúan cinco puntos:
+    1. **Idea:** una app que resuelva una necesidad específica; no hace falta que sea grande (alcanza, por ejemplo, con una app de notas). Puede usarse IA para generar código, pero hay que poder explicarlo o modificarlo directamente.
+    2. **Patrón arquitectónico y patrón de diseño:** se ven en las próximas dos clases (entre ellos, Clean Architecture, la recomendación oficial de Flutter).
+    3. **Almacenamiento:** a elección, local con `sqlite` (con CRUD completo: crear, consultar, actualizar, eliminar) o consumo de un API REST (alcanza con consumir y mostrar los datos correctamente). La cátedra ofrece un repositorio con un API "fake" que simula guardar/editar/eliminar sin persistir de verdad, para quien no tenga un API propio.
+    4. **Manejador de estado:** a elección entre Provider, Riverpod, BLoC o GetX; se verá un ejemplo de cada uno en próximas clases antes de decidir.
+    5. **Diseño adaptable:** `flutter_screenutil_plus` (clase 10), rutas de navegación organizadas (próxima clase), colores y temas aplicados (clase 9); multidioma es opcional.
+  - **Niveles de proyecto sugeridos** (con diseños en Figma que la cátedra comparte, para quien no tenga una idea propia):
+    - *Fácil:* app de notas (lista con crear, editar y eliminar).
+    - *Medio:* tienda de hamburguesas (solo diseño a replicar); login/registro/recuperar contraseña + lista consumiendo la API pública de Rick and Morty; o un juego de memoria (lógica con arreglos y almacenamiento local).
+    - *Difícil:* e-commerce de zapatos, con selector de tipografía y tamaño de texto; juego 2D con el paquete Flame (curso propio de Código Facilito, algo desactualizado pero con la misma lógica de base); app de cafetería. Reto opcional con premio (un mes premium de Código Facilito): álbum de cartas de Código Facilito, consumiendo su API y marcando cada carta como obtenida o no, con alguna animación.
+  - **Entregables:** PDF con manual técnico (capturas del flujo de navegación entre pantallas, paleta de colores y tipografías usadas) + link a un repositorio de GitHub público y bien documentado (README con imágenes, descripción y formato markdown — funciona como portafolio). Opcional: publicar en Play Store (requiere la licencia paga única de Google Play; la profesora recomienda pagarla solo si se planea seguir publicando apps a futuro).
+  - **Organización sugerida mientras tanto:** una carpeta `view` con una subcarpeta por pantalla o funcionalidad (por ejemplo `productos`, `categorias`), para ir armando el diseño; la lógica se conecta más adelante, al ver patrones arquitectónicos.
+
+  > **Fecha de entrega: 30 de noviembre de 2026.** A partir de esa fecha empieza la corrección; la profesora estará de vacaciones desde el 30 de octubre y pide entregar antes para poder revisar a tiempo. Dudas y revisión de errores del proyecto, por Telegram. Clase movida de jueves a lunes por un evento (Flutter Conf, Cancún); próxima clase: patrones de diseño y arquitectónicos.
+
+* **Clase 12 — Navegación**
+  - **Contenido:** `Navigator` nativo (pila de ventanas, `push`/`pop`, `pushReplacement`, `pushAndRemoveUntil`) y rutas por nombre centralizadas en una clase `Router` (`onGenerateRoute`, `RouteSettings`, ruta por defecto ante un nombre no encontrado); organización de la carpeta `view` con una pantalla por carpeta; introducción a MVVM (Model/View/ViewModel) como primer patrón arquitectónico, frente a Clean Architecture para proyectos grandes; internacionalización con `flutter_localizations` + `intl`, `l10n.yaml`, archivos `.arb` por idioma, `AppLocalizations` generado automáticamente y selector de idioma manual; paquete `go_router` para que la web tenga URLs identificables por pantalla (`GoRouter`, `GoRoute`, rutas anidadas, `context.push`/`context.go`), parámetros de ruta (`state.pathParameters`, pasar solo el `id` y volver a consultar el dato completo) y `extra` para compartir un objeto completo (no persiste al recargar la página); transiciones personalizadas con `CustomTransitionPage` (`transitionsBuilder`, `Curves`, `FadeTransition` y otras). Quedaron pendientes para la próxima clase algunos errores de `go_router` con `pushNamed` en web que la profesora no llegó a resolver en vivo.
+
+  → Detalle completo en [`flutter/conceptos.md`](./flutter/conceptos.md)
+
+  - **Actividades asignadas:** ninguna asignada puntualmente; se retoma el proyecto final (clase 11) aplicando la navegación y, opcionalmente, el multidioma vistos hoy.
+
+  > Diapositivas y código de la clase en el repo de la profesora ([`Marines0210/bootcamp_flutter`](https://github.com/Marines0210/bootcamp_flutter)). Dudas por Telegram; el problema de `go_router` en web quedó para revisar y comentar en la próxima clase. Próxima clase: gestión de estado y patrones arquitectónicos.

@@ -57,6 +57,14 @@ Bootcamp de Desarrollo de Apps Móviles con Flutter — Código Facilito — Pro
   - [43. `MediaQuery`, `LayoutBuilder` y puntos de quiebre](#43-mediaquery-layoutbuilder-y-puntos-de-quiebre)
   - [44. Patrones adaptativos](#44-patrones-adaptativos)
   - [45. Textos y contenedores adaptables: `flutter_screenutil_plus`](#45-textos-y-contenedores-adaptables-flutter_screenutil_plus)
+  - [46. `Navigator`: la pila de ventanas](#46-navigator-la-pila-de-ventanas)
+  - [47. Rutas por nombre y una clase `Router` centralizada](#47-rutas-por-nombre-y-una-clase-router-centralizada)
+  - [48. Introducción a MVVM](#48-introducción-a-mvvm)
+  - [49. Internacionalización: paquetes y archivo de configuración](#49-internacionalización-paquetes-y-archivo-de-configuración)
+  - [50. Archivos `.arb` y uso de los textos generados](#50-archivos-arb-y-uso-de-los-textos-generados)
+  - [51. `go_router`: rutas identificables para la web](#51-go_router-rutas-identificables-para-la-web)
+  - [52. Parámetros de ruta y `extra` en `go_router`](#52-parámetros-de-ruta-y-extra-en-go_router)
+  - [53. Transiciones personalizadas con `CustomTransitionPage`](#53-transiciones-personalizadas-con-customtransitionpage)
 
 **Repaso rápido para el examen:** [21](#21-texteditingcontroller-y-atributos-de-textformfield) · [22](#22-form-globalkeyformstate-y-validación) · [28](#28-atributos-de-listview) · [37](#37-temas-de-componentes-botones-card-y-appbar) · [43](#43-mediaquery-layoutbuilder-y-puntos-de-quiebre)
 
@@ -2161,3 +2169,329 @@ ResponsiveBuilder(
 ---
 
 *Fuentes puntuales de las secciones 38 a 45: documentación del paquete [`flutter_screenutil_plus`](https://pub.dev/packages/flutter_screenutil_plus) en pub.dev, y diapositivas de la cátedra de la clase de responsividad.*
+
+---
+
+## 46. `Navigator`: la pila de ventanas
+
+Flutter maneja la navegación entre pantallas con una **pila** (*stack*), a la que se hace referencia como el *navigation stack*. Cada ventana que se abre se **apila** encima de la anterior, y cerrarla la **saca** de la pila:
+
+- **`push`** = agregar una ventana a la pila (abrirla).
+- **`pop`** = sacar la ventana de arriba de la pila (cerrarla). Es el mismo mecanismo que cierra un `AlertDialog` (sección 31): `Navigator.pop(context)`.
+
+El **contexto** (`BuildContext`) es, en la práctica, la ventana (o el widget) desde el que se está llamando: le indica a Flutter *desde dónde* se navega, y por eso casi todas las operaciones de navegación lo reciben como primer parámetro.
+
+```dart
+Navigator.push(
+  context,
+  MaterialPageRoute(builder: (context) => const DetalleView()),
+);
+
+Navigator.pop(context);
+```
+
+`MaterialPageRoute` define *cómo* se muestra la nueva pantalla (con la transición estándar de Material) y recibe un `builder` que, dado el contexto, devuelve la ventana a mostrar.
+
+**Características de la pila:**
+
+- Guarda un **historial** de ventanas, lo que permite volver atrás paso a paso siguiendo el mismo camino por el que se avanzó (el botón de retroceso del sistema hace `pop`).
+- Tiene una **pantalla raíz**, la primera que se abrió (la base de la pila). Si se le hace `pop`, se cierra la aplicación entera.
+
+> ⚠️ Hay que llevar cuidado con la cantidad de `pop` que se ejecutan: hacer un `pop` de más puede terminar cerrando la pantalla principal (o la app) en lugar de la que se pretendía cerrar.
+
+**Variantes de apertura.** Además de `push` y `pop`, existen operaciones para casos donde no conviene simplemente apilar:
+
+| Método | Qué hace | Cuándo usarlo |
+|---|---|---|
+| `Navigator.push` | Abre una ventana nueva, arriba de la actual | Caso general |
+| `Navigator.pop` | Cierra la ventana actual y vuelve a la anterior | Cerrar una pantalla o un diálogo |
+| `Navigator.pushReplacement` | Abre una ventana nueva y **reemplaza** la actual en la pila (la actual no queda debajo) | Pasar de una pantalla a otra sin que la primera sea accesible con "atrás" |
+| `Navigator.pushAndRemoveUntil` | Abre una ventana y **elimina** todas las anteriores hasta la condición indicada | Pantalla de login: tras iniciar sesión, se limpia todo lo anterior y queda solo la pantalla principal, para que "atrás" saque de la app en lugar de volver al login |
+
+## 47. Rutas por nombre y una clase `Router` centralizada
+
+Escribir `MaterialPageRoute(builder: (context) => const DetalleView())` directamente en cada botón funciona, pero obliga a repetir esa construcción en cada lugar que abre una ventana, y es más código del necesario. La alternativa es **nombrar** cada ruta y navegar por su nombre:
+
+```dart
+Navigator.pushNamed(context, '/detalles');
+```
+
+**Centralizar las rutas.** En lugar de registrar cada ruta suelta, conviene definir una clase con un método estático que decide, a partir del nombre recibido, qué ventana devolver:
+
+```dart
+// core/navigation/app_router.dart
+class AppRouter {
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/':
+        return MaterialPageRoute(builder: (context) => const HomeView());
+      case '/detalles':
+        return MaterialPageRoute(builder: (context) => const DetallesView());
+      default:
+        return MaterialPageRoute(
+          builder: (context) => const Scaffold(
+            body: Center(child: Text("Error: no se encontró la ventana")),
+          ),
+        );
+    }
+  }
+}
+```
+
+```dart
+MaterialApp(
+  onGenerateRoute: AppRouter.generateRoute,
+  initialRoute: '/',
+)
+```
+
+- `onGenerateRoute` recibe el `RouteSettings` de la ruta pedida (con el `name` que se usó en `pushNamed`) y debe devolver el `Route` correspondiente.
+- La rama `default` del `switch` es la ruta que se muestra cuando no existe ninguna con ese nombre: mejor mostrar una pantalla de error clara que dejar la app sin respuesta.
+
+Con esto, todas las rutas quedan en un único archivo: agregar o modificar una ventana se resuelve ahí, sin salir a buscar cada botón que la abre.
+
+**Organización de las ventanas.** Como consecuencia de centralizar la navegación, conviene que la carpeta `view` (sección 11) contenga **solo pantallas** (una carpeta por pantalla, con su propio `widget/` para los componentes que le pertenecen, como en la sección 33), sin mezclarlas con otros widgets de uso general.
+
+> ⚠️ Esta forma de navegar (`Navigator` + `onGenerateRoute`) es nativa de Flutter y funciona bien en apps puramente móviles, pero **no alcanza para la web**: no genera una URL identificable por pantalla en la barra de direcciones. Al recargar la página o compartir un enlace, la app vuelve siempre a la pantalla inicial, porque no hay ninguna ruta real que identifique en qué pantalla estaba el usuario. Este es el problema que resuelve el paquete `go_router` (secciones 51 a 53).
+
+## 48. Introducción a MVVM
+
+Antes de organizar la navegación con `go_router`, la cátedra introduce el primero de los patrones arquitectónicos que se profundizarán más adelante (criterio del proyecto final): **MVVM** (*Model-View-ViewModel*). Se elige para los ejemplos de clase por ser más simple que otras arquitecturas, adecuado para proyectos chicos o medianos.
+
+- **Model:** los datos y su estructura (las clases como `User` de la sección 31).
+- **View:** las pantallas, lo que el usuario ve (la carpeta `view`).
+- **ViewModel:** conecta el Model con la View: contiene la lógica de la pantalla (qué datos mostrar, qué hacer con una acción del usuario) sin ocuparse del dibujo en sí.
+
+MVVM no es la única opción: para proyectos muy grandes, con mucha lógica de negocio (el ejemplo dado es una app bancaria), conviene una arquitectura más robusta, como **Clean Architecture** (la recomendación oficial de Flutter). Cuanta más lógica concentra una app, más urgente es separarla en capas: si todo está acoplado, un error se vuelve mucho más difícil de rastrear. Apps con muchas funciones pero lógica relativamente simple (los ejemplos dados son Uber y redes sociales) pueden resolverse con una arquitectura intermedia.
+
+## 49. Internacionalización: paquetes y archivo de configuración
+
+Una app **multidioma** (o **internacionalizada**) puede mostrar su contenido en más de un idioma, lo que amplía el público al que llega. Más allá de ofrecer varios idiomas, sirve igual para **centralizar los textos**: todos los textos de la app quedan en un único archivo por idioma, así que corregir una palabra (una falta de ortografía, por ejemplo) se hace en un solo lugar y el cambio se refleja en todas las pantallas donde se usa ese texto — el mismo razonamiento que llevó a centralizar los colores (sección 33).
+
+**Paquetes necesarios.** En el `pubspec.yaml`:
+
+```yaml
+dependencies:
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+
+flutter:
+  generate: true
+```
+
+- `flutter_localizations` es el paquete del propio SDK de Flutter que permite internacionalizar la app.
+- `intl` provee utilidades de formato e internacionalización (fechas, números, plurales) usadas junto con la generación de código.
+- `generate: true` habilita la generación automática de código a partir de los archivos de idioma.
+
+**Archivo `l10n.yaml`.** En la raíz del proyecto (junto al `pubspec.yaml`), un archivo llamado exactamente `l10n.yaml` le indica al generador dónde están los textos y qué código producir:
+
+```yaml
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+```
+
+- `arb-dir`: la carpeta donde van los archivos de texto por idioma (hay que crearla a mano, con ese nombre exacto).
+- `template-arb-file`: el archivo que se toma como plantilla — normalmente el del idioma por defecto.
+- `output-localization-file`: el nombre del archivo Dart que el generador va a crear automáticamente.
+
+## 50. Archivos `.arb` y uso de los textos generados
+
+**Archivos `.arb`** (*Application Resource Bundle*), uno por idioma, con el nombre `app_<código>.arb` (`app_en.arb` para inglés, `app_es.arb` para español). El código de idioma son las dos letras del estándar ISO 639-1 (`en`, `es`, `fr`, `ja`, …). Cada archivo es un JSON con pares clave-texto:
+
+```json
+// lib/l10n/app_en.arb
+{
+  "hello": "Hello"
+}
+```
+
+```json
+// lib/l10n/app_es.arb
+{
+  "hello": "Hola"
+}
+```
+
+La **clave** (`hello`) es la misma en todos los idiomas; el **valor** es el texto en ese idioma. Al guardar, el generador crea automáticamente (dentro de la carpeta que indica `output-localization-file`) una clase por idioma con un método por cada clave.
+
+**Configurar `MaterialApp`.** Tres atributos habilitan la internacionalización:
+
+```dart
+MaterialApp(
+  localizationsDelegates: AppLocalizations.localizationsDelegates,
+  supportedLocales: AppLocalizations.supportedLocales,
+  locale: const Locale('en'), // idioma fijo (opcional, ver más abajo)
+  home: const HomeView(),
+)
+```
+
+- `localizationsDelegates`: habilita que la app sea internacionalizada y pueda cargar los textos.
+- `supportedLocales`: los idiomas que la app reconoce (se generan a partir de los archivos `.arb` creados).
+- `locale`: fija el idioma sin importar el del dispositivo — funciona como un candado. Si se omite, la app usa el idioma del sistema operativo cuando está entre los soportados.
+
+**Usar los textos en una pantalla:**
+
+```dart
+final localizations = AppLocalizations.of(context)!;
+
+Text(localizations.hello)
+```
+
+`AppLocalizations.of(context)` detecta el idioma activo y devuelve la instancia con los textos de ese idioma; `.hello` es el método generado a partir de la clave del `.arb`. Cambiar de idioma en tiempo de ejecución hace que el texto se actualice donde sea que se use esa clave, en vez de quedar fijo como un `Text("Hola")` común.
+
+**Idioma no soportado.** Si el idioma del dispositivo no está entre los `supportedLocales`, la app usa el **idioma por defecto**: el que se definió como `template-arb-file` en `l10n.yaml` (el primero en la lista de soportados). Antes de esta convención, Flutter permitía elegir cualquier idioma como predeterminado; ahora, en la práctica, suele dejarse el inglés.
+
+**Selector de idioma dentro de la app.** Además de seguir el idioma del dispositivo, se le puede dar al usuario la opción de elegirlo manualmente (por ejemplo con un `DropdownButton`, sección 24) en vez de depender de la configuración del teléfono. El cambio actualiza el `locale` de `MaterialApp` con `setState()` (o el manejador de estado que use el proyecto) para que la interfaz se reconstruya con el nuevo idioma.
+
+## 51. `go_router`: rutas identificables para la web
+
+`go_router` (`flutter pub add go_router`) reemplaza a `Navigator` + `onGenerateRoute` (sección 47) para resolver el problema de la web: genera una **URL real** para cada pantalla, visible en la barra de direcciones del navegador. Sin eso, recargar la página, usar el botón "atrás" del navegador o compartir un enlace directo a una pantalla interna no funciona, porque no hay ninguna ruta que identifique en qué pantalla estaba el usuario — el mismo comportamiento esperado en cualquier sitio web. En apps puramente móviles, `Navigator` nativo alcanza sin este paquete.
+
+**Configuración.** Se crea una instancia de `GoRouter` con la lista de rutas:
+
+```dart
+final GoRouter router = GoRouter(
+  initialLocation: '/',
+  routes: [
+    GoRoute(
+      path: '/',
+      name: 'home',
+      builder: (context, state) => const HomeView(),
+    ),
+    GoRoute(
+      path: '/detalles',
+      name: 'detalles',
+      builder: (context, state) => const DetallesView(),
+    ),
+  ],
+);
+```
+
+```dart
+MaterialApp.router(
+  routerConfig: router,
+)
+```
+
+- `initialLocation`: la ruta que se abre al cargar la app.
+- Cada `GoRoute` define un `path` (la URL), opcionalmente un `name` (para navegar por nombre en vez de por texto literal) y un `builder`, que recibe el `context` y el `state` (`GoRouterState`, con la información de la ruta actual) y devuelve la ventana.
+- `MaterialApp.router` reemplaza a `MaterialApp` cuando se usa un paquete de ruteo declarativo como `go_router`; recibe la configuración por `routerConfig` en lugar de `home`.
+
+**Rutas anidadas.** Una ruta puede definirse dentro de otra, cuando una pantalla solo tiene sentido abierta desde otra (por ejemplo, el detalle de un producto del carrito, abierto desde la pantalla del carrito):
+
+```dart
+GoRoute(
+  path: '/',
+  name: 'home',
+  builder: (context, state) => const HomeView(),
+  routes: [
+    GoRoute(
+      path: 'detalles',
+      name: 'detalles',
+      builder: (context, state) => const DetallesView(),
+    ),
+  ],
+)
+```
+
+**Navegar con `go_router`.** Ya no se usa `Navigator`: se navega a través del `context`, que ya trae incorporados los métodos del paquete:
+
+```dart
+context.push('/detalles');       // push por nombre de ruta
+context.pushNamed('detalles');   // push por el name de la ruta
+context.go('/detalles');         // reemplaza toda la pila por esta ruta
+```
+
+`context.push` agrega la ruta a la pila (equivalente al `Navigator.push` de la sección 46); `context.go` reemplaza toda la navegación por la ruta indicada, sin apilar sobre la anterior.
+
+## 52. Parámetros de ruta y `extra` en `go_router`
+
+**Parámetros en la URL (`path parameters`).** Cuando una pantalla necesita un dato específico (el detalle de un usuario puntual), ese dato se identifica en la propia ruta, con dos puntos delante del nombre del parámetro:
+
+```dart
+GoRoute(
+  path: '/detalles/:id',
+  name: 'detalles',
+  builder: (context, state) {
+    final String id = state.pathParameters['id']!;
+    return DetallesView(userId: id);
+  },
+)
+```
+
+- `:id` en el `path` define el parámetro; `state.pathParameters['id']` lo recupera dentro del `builder`.
+- Al navegar, el parámetro se reemplaza por el valor real, y ese valor queda en la URL (`/detalles/5`): recargar la página vuelve a esa misma ruta con ese mismo `id`, a diferencia de lo que pasaba con `Navigator` nativo.
+
+```dart
+context.push('/detalles/${user.id}');
+// o, navegando por nombre:
+context.pushNamed('detalles', pathParameters: {'id': user.id});
+```
+
+**Solo el identificador, no el objeto completo.** La práctica recomendada es pasar únicamente el `id` por la ruta, y que la pantalla de destino **vuelva a consultar** el dato completo (a la base de datos o al API) a partir de ese `id`, en vez de mandar el objeto entero:
+
+```dart
+@override
+void initState() {
+  super.initState();
+  final id = widget.userId;
+  // usuario = obtenerUsuarioPorId(id);
+}
+```
+
+Si en cambio se comparte el objeto completo y la pantalla se recarga (algo frecuente en la web, donde cada carga es independiente), ese objeto no viaja con la recarga y la pantalla se queda sin datos — el error típico es una pantalla en blanco o roja por intentar usar un valor nulo. Reconsultar por `id` evita ese problema porque la nueva carga siempre tiene de dónde partir: solo necesita el identificador, que sí queda en la URL.
+
+**`extra`: pasar un objeto completo.** Para los casos en que sí conviene compartir un objeto completo entre pantallas (evitando una nueva consulta), `go_router` ofrece el parámetro `extra`:
+
+```dart
+context.push('/detalles', extra: user);
+```
+
+```dart
+GoRoute(
+  path: '/detalles',
+  name: 'detalles',
+  builder: (context, state) {
+    final user = state.extra as UserModel;
+    return DetallesView(user: user);
+  },
+)
+```
+
+`state.extra` llega como `Object?`, así que hay que convertirlo (`as UserModel`) al tipo esperado. A diferencia de los `pathParameters`, `extra` no queda reflejado en la URL: se pierde al recargar la página, por lo que no reemplaza a pasar el `id` cuando la pantalla debe sobrevivir a una recarga.
+
+## 53. Transiciones personalizadas con `CustomTransitionPage`
+
+Cada ruta de `go_router` puede definir su propia animación de entrada con `pageBuilder` (en vez de `builder`) y `CustomTransitionPage`:
+
+```dart
+GoRoute(
+  path: '/detalles',
+  name: 'detalles',
+  pageBuilder: (context, state) {
+    return CustomTransitionPage(
+      key: state.pageKey,
+      child: const DetallesView(),
+      transitionDuration: const Duration(milliseconds: 300),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+        );
+        return FadeTransition(opacity: curvedAnimation, child: child);
+      },
+    );
+  },
+)
+```
+
+- `transitionDuration`: cuánto dura la animación. Muy larga, la apertura se siente lenta; muy corta, apenas se nota — conviene un tiempo intermedio en el que la transición se perciba sin demorar la navegación.
+- `transitionsBuilder`: recibe la animación entre pantallas y devuelve el widget de transición que envuelve al `child` (la pantalla de destino).
+- `Curves` (`easeInOut`, `bounceOut`, `elasticIn`, entre otras) define cómo se distribuye la animación en el tiempo — no solo *qué* cambia, sino *cómo* lo hace: con un rebote al final, acelerando al principio y frenando al final, etc.
+- `FadeTransition` es una de varias transiciones disponibles: aparecer con una animación de opacidad. También existen, entre otras, `SlideTransition` (entra desde un costado), `RotationTransition` (con una rotación) y `ScaleTransition` (la pantalla crece desde un punto).
+
+---
+
+*Fuentes puntuales de las secciones 46 a 53: documentación oficial de Flutter — [`Navigator`](https://api.flutter.dev/flutter/widgets/Navigator-class.html) e [Internationalizing Flutter apps](https://docs.flutter.dev/ui/accessibility-and-internationalization/internationalization); y del paquete [`go_router`](https://pub.dev/packages/go_router) en pub.dev, incluida la migración de `GoRouterState.params` a `GoRouterState.pathParameters` en la versión 7.*
